@@ -11,6 +11,7 @@ from sec2 import Ui_Form
 import os
 
 
+
 class Window(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
@@ -84,21 +85,28 @@ class Window(QtWidgets.QWidget):
     
     # переход в окно секундомера
     def window_sec(self):
+        
+        print(11111111111111111111111111111)
         for i in self.ui.list_timer_widget:
             i.hide()
             self.ui.pushButton_Timer.setStyleSheet("background-color: #f66151;")
             for i in self.ui.list_sec_widget:
                 i.show()
-                self.ui.pushButton_Sec.setStyleSheet("background-color: #57e389;")
+            self.ui.pushButton_Sec.setStyleSheet("background-color: #57e389;")
             for i in self.label_Secs:
                 i.show()
+        #
+        self.ui.spacerItem4.changeSize(0, 20, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.ui.verticalLayout.invalidate()
+        
+        # self.adjustSize()
     
     # переход в окно таймера
     def window_timer(self):
         
         for i in self.ui.list_sec_widget:
             i.hide()
-            self.ui.pushButton_Sec.setStyleSheet("background-color: #f66151;")
+        self.ui.pushButton_Sec.setStyleSheet("background-color: #f66151;")
         for i in self.ui.list_timer_widget:
             i.show()
         self.ui.pushButton_Timer.setStyleSheet("background-color: #57e389;")
@@ -106,7 +114,10 @@ class Window(QtWidgets.QWidget):
         self.ui.pushButton_Timer_music.hide()
         for i in self.label_Secs:
             i.hide()
-        self.resize(516, 200)
+        # изменяем поведение распорки делаем чтобы она занимала макс значение по вертикали - Expanding
+        self.ui.spacerItem4.changeSize(0, 20, QtWidgets.QSizePolicy.Policy.Minimum,
+                                       QtWidgets.QSizePolicy.Policy.Expanding)
+        self.ui.verticalLayout.invalidate()
     
     # реализация таймера, с изменением надписей кнопок и их заморозки
     def start_stop_timer(self):
@@ -250,9 +261,14 @@ class Window(QtWidgets.QWidget):
         self.ui.label_Sec_h_2.setText(str(self.sec_h))
         self.ui.label_Sec_min_2.setText(str(self.sec_m))
         self.ui.label_Sec_sec_2.setText(str(self.sec_s))
-        for i in range(len(self.rounds) - 1):
-            self.label_Secs[i].hide()
-        self.resize(516, 200)
+        # for i in range(len(self.rounds) - 1):
+        for i in range(len(self.label_Secs) - 1):
+            try:
+                self.label_Secs[i].hide()
+            except Exception as e:
+                print(i, len(self.label_Secs))
+       
+        # self.resize(516, 200)
         # self.adjustSize()
         self.label_Secs = []
         self.rounds = []

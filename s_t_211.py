@@ -20,6 +20,14 @@ class Ui_Dialog(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout.addItem(spacerItem1)
+        self.pushButton_Alarm = QtWidgets.QPushButton(parent=Dialog)
+        self.pushButton_Alarm.setMinimumSize(QtCore.QSize(128, 36))
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        self.pushButton_Alarm.setFont(font)
+        self.pushButton_Alarm.setStyleSheet("")
+        self.pushButton_Alarm.setObjectName("pushButton_Alarm")
+        self.horizontalLayout.addWidget(self.pushButton_Alarm)
         self.pushButton_Timer = QtWidgets.QPushButton(parent=Dialog)
         self.pushButton_Timer.setMinimumSize(QtCore.QSize(128, 36))
         font = QtGui.QFont()
@@ -38,6 +46,33 @@ class Ui_Dialog(object):
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout.addItem(spacerItem2)
         self.verticalLayout.addLayout(self.horizontalLayout)
+        
+        # Будильник
+        
+        self.pushButton_Alarm_add = QtWidgets.QPushButton(parent=Dialog)
+        self.pushButton_Alarm_add.setMinimumSize(QtCore.QSize(99, 35))
+        self.pushButton_Alarm_add.setObjectName("pushButton_Alarm_add")
+        self.verticalLayout.addWidget(self.pushButton_Alarm_add)
+        self.scrollArea_Alarm = QtWidgets.QScrollArea(parent=Dialog)
+        self.scrollArea_Alarm.setMinimumSize(QtCore.QSize(0, 520))
+        self.scrollArea_Alarm.setWidgetResizable(True)
+        self.scrollArea_Alarm.setObjectName("scrollArea_Alarm")
+        self.scrollAreaWidgetContents_Alarm = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents_Alarm.setGeometry(QtCore.QRect(0, 0, 442, 514))
+        self.scrollAreaWidgetContents_Alarm.setObjectName("scrollAreaWidgetContents_Alarm")
+        self.verticalLayout_4A = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_Alarm)
+        self.verticalLayout_4A.setObjectName("verticalLayout_4A")
+        
+        
+        self.scrollArea_Alarm.setWidget(self.scrollAreaWidgetContents_Alarm)
+        self.verticalLayout.addWidget(self.scrollArea_Alarm)
+        self.horizontalLayout_20.addLayout(self.verticalLayout)
+        spacerItem6A = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding,
+                                            QtWidgets.QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_20.addItem(spacerItem6A)
+        
+        
+        # Таймер
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label_h = QtWidgets.QLabel(parent=Dialog)
@@ -193,6 +228,12 @@ class Ui_Dialog(object):
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
         
+        self.list_alarm_widget = [self.pushButton_Alarm_add, self.scrollArea_Alarm, self.scrollAreaWidgetContents_Alarm]
+        # self.list_alarm_widget = [self.pushButton_Alarm_add, self.scrollArea_Alarm, self.scrollAreaWidgetContents_Alarm,
+        #                           self.label_name,self.pushButton_ch_Alarm, self.label_d1, self.label_d2, self.label_d3,
+        #                           self.label_d4, self.label_d5, self.label_d6, self.label_d7, self.checkBox,
+        #                           self.pushButton_AlarmDel]
+        
         self.list_sec_widget = [self.label_Sec_h_2, self.label_Sec_h, self.label_Sec_min_2,
                                 self.label_Sec_min, self.label_Sec_sec_2, self.label_Sec_sec,
                                 self.pushButton_Sec_start_stop, self.pushButton_Sec_reset,
@@ -204,15 +245,20 @@ class Ui_Dialog(object):
                                   self.pushButton_Timer_start_stop, self.pushButton_Timer_reset,
                                   self.pushButton_Timer_setTimer, self.pushButton_Timer_music]
         
+        for i in self.list_timer_widget:
+            i.hide()
+        
         for i in self.list_sec_widget:
             i.hide()
         
-        self.pushButton_Timer.setStyleSheet("background-color: #57e389;")
+        self.pushButton_Alarm.setStyleSheet("background-color: #57e389;")
+        self.pushButton_Timer.setStyleSheet("background-color: #f66151;")
         self.pushButton_Sec.setStyleSheet("background-color: #f66151;")
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Секундомер/Таймер"))
+        Dialog.setWindowTitle(_translate("Dialog", "Будильник/Таймер/Секндомер"))
+        self.pushButton_Alarm.setText(_translate("Dialog", "Будильник"))
         self.pushButton_Timer.setText(_translate("Dialog", "Таймер"))
         self.pushButton_Sec.setText(_translate("Dialog", "Секундомер"))
         self.label_h.setText(_translate("Dialog", "0"))
@@ -237,7 +283,17 @@ class Ui_Dialog(object):
         self.label51.setText(_translate("Dialog", "Время круга"))
         self.label52.setText(_translate("Dialog", "Круги"))
         self.pushButton_Timer_music.setText(_translate("Dialog", "Остановить музыку"))
-
+        self.pushButton_Alarm_add.setText(_translate("Dialog", "Добавить будильник"))
+        # self.label_name.setText(_translate("Dialog", "Название"))
+        # self.pushButton_ch_Alarm.setText(_translate("Dialog", "PushButton_ch_Alatm"))
+        # self.label_d1.setText(_translate("Dialog", "Пн"))
+        # self.label_d2.setText(_translate("Dialog", "Вт"))
+        # self.label_d3.setText(_translate("Dialog", "Ср"))
+        # self.label_d4.setText(_translate("Dialog", "Чт"))
+        # self.label_d5.setText(_translate("Dialog", "Пн"))
+        # self.label_d6.setText(_translate("Dialog", "Сб"))
+        # self.label_d7.setText(_translate("Dialog", "Вс"))
+        # self.pushButton_AlarmDel.setText(_translate("Dialog", "Удалить"))
     
 if __name__ == "__main__":
     import sys
