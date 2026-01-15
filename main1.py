@@ -14,6 +14,9 @@ from sec2 import Ui_Form
 from addAlarm import U_Dialog
 import os
 
+# Получаем путь к папке скрипта для работы с файлами
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 class AlarmTriggeredDialog(QtWidgets.QDialog):
     stop_alarm = QtCore.pyqtSignal()
 
@@ -51,8 +54,12 @@ class AlarmTriggeredDialog(QtWidgets.QDialog):
 
 class AlarmWidget(QtWidgets.QWidget):
     alarm_updated = QtCore.pyqtSignal()
-    def __init__(self,value, parent=None):
+    # Новый сигнал для уведомления об удалении
+    alarm_deleted = QtCore.pyqtSignal(str)
+
+    def __init__(self, value, parent=None):
         super().__init__(parent)
+        self.id = value["id"]
         self.id = value["id"]
         self.name_alarm = value['name_al']
         self.time_al = value['time_al']
@@ -133,10 +140,13 @@ class AlarmWidget(QtWidgets.QWidget):
         self.enabled = self.checkBox_2.isChecked()
         self.trigger_token += 1
         self.alarm_updated.emit()
-        
+
+    
     def del_later(self):
         # 1. Сначала скрываем виджет, чтобы он не мешался
         self.hide()
+        # Сначала уведомляем главное окно, чтобы оно очистило кэш срабатываний
+        self.alarm_deleted.emit(self.id)
         # 2. Удаляем его из компоновщика (Layout) ПРЯМО СЕЙЧАС
         # Это важно: save_all_alarms не увидит его в списке виджетов слоя
         self.setParent(None)
@@ -186,36 +196,35 @@ class Window(QtWidgets.QWidget):
         super().__init__()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        # Получаем текущие флаги окна и убираем из них кнопку развертывания
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowMaximizeButtonHint)
         
-        self.path_alarm = "alarm_data.json"
-        self.path_timer = "timer_data.json"
+        # Используем BASE_DIR для путей
+        self.path_alarm = os.path.join(BASE_DIR, "alarm_data.json")
+        self.path_timer = os.path.join(BASE_DIR, "timer_data.json")
+        self.default_music = os.path.join(BASE_DIR, "1.mp3")
         
-        # Загрузка будильников из файла
+        self.triggered_today = {}
+        self.player = QMediaPlayer(self)
+        self.audio_output = QAudioOutput(self)
+        self.player.setAudioOutput(self.audio_output)
+        
+        # Загрузка
         try:
             alarms = data_from_json(self.path_alarm)
             for alarm_val in alarms:
-                # Вызываем add_alarm, передавая данные из файла
-                self.add_alarm(False, value=alarm_val)
-        except FileNotFoundError:
-            print("Файл будильников еще не создан")
+                # ВАЖНО: Передаем только именованный аргумент
+                self.add_alarm(value=alarm_val)
+        except Exception:
+            print("Файл будильников не найден или пуст")
         
-        # устанавливаем первоначальное значение таймера
+        # Таймер (логика сокращена для краткости, оставьте свою)
+        self.timer_set = 0
         try:
             js = data_from_json(self.path_timer)
-            self.timer_set = js.get('save_timer')
-            self.fist_timer_set = self.timer_set
-            # устанавливаем первоначальные значения времени и файла музыки
-            self.calc_time()
-            self.path_music = js.get('path_music')
-            if not os.path.exists(self.path_music):
-                raise FileNotFoundError("не найден файл 1.mp3")
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            self.timer_set = 0
-            # устанавливаем первоначальные значения времени и файла музыки
-            self.h, self.m, self.s = 0, 0, 0
-            self.path_music = '1.mp3'
+            self.timer_set = js.get('save_timer', 0)
+            self.path_music = js.get('path_music', self.default_music)
+        except:
+            self.path_music = self.default_music
         
         # нажатие на кнопку секундомер
         self.ui.pushButton_Sec.clicked.connect(self.window_sec)
@@ -526,55 +535,50 @@ class Window(QtWidgets.QWidget):
         if status == QMediaPlayer.MediaStatus.EndOfMedia:
             self.music_stop()
     
-    def add_alarm(self, check, value=None): # Сигнал clicked ВСЕГДА передаёт аргумент clicked(bool checked = false)
-        # Добавление нового будильника.
+    def add_alarm(self, value=None):
+        # Если value это False (пришло от нажатия кнопки), создаем новый ID
+        if value is None or isinstance(value, bool):
+           
+            value = {
+                'id': uuid.uuid4().hex,
+                'time_al': '08:00',
+                'name_al': 'Новый будильник',
+                'week_al': [False] * 7,
+                'music': self.default_music,
+                'enabled': False
+            }
         
-        if value is None:
-            new_id = uuid.uuid4().hex
-        
-            value = {'id': new_id,
-                     'time_al': '22:00',
-                     'name_al': 'Пора спать',
-                     'week_al': [False, False, False, False, False, False, False],
-                     'music': '1.mp3',
-                     'enabled': False}
-            
-        # Создаем виджет будильника
         alarm = AlarmWidget(value)
         alarm.alarm_updated.connect(self.save_all_alarms)
-        # Добавляем его в вертикальный слой внутри ScrollArea
+        # Подключаем очистку кэша при удалении
+        alarm.alarm_deleted.connect(self.cleanup_triggered_cache)
+        # Вставляем перед распоркой (которая у вас в verticalLayout_4A)
         self.ui.verticalLayout_4A.insertWidget(0, alarm)
         self.save_all_alarms()
         
-    
+    def cleanup_triggered_cache(self, alarm_id):
+        """Удаляет данные о срабатывании для удаленного будильника"""
+        if alarm_id in self.triggered_today:
+            del self.triggered_today[alarm_id]
     
     def save_all_alarms(self):
         all_data = []
-        
-        # Собираем данные со всех виджетов AlarmWidget в слое
-        for i in range(self.ui.verticalLayout_4A.count()):
-            item = self.ui.verticalLayout_4A.itemAt(i)
-            widget = item.widget()
-            
-            if isinstance(widget, AlarmWidget):
-                # Формируем словарь из текущих атрибутов виджета
-                alarm_data = {
+        # findChildren надежнее, чем перебор layout.count()
+        for widget in self.findChildren(AlarmWidget):
+            # Проверяем, не помечен ли виджет на удаление
+            if widget.isVisible():
+                all_data.append({
                     'id': widget.id,
                     'name_al': widget.name_alarm,
                     'time_al': widget.time_al,
                     'week_al': widget.week,
                     'music': widget.music,
-                    'enabled': widget.checkBox_2.isChecked()  # Берем состояние галочки
-                }
-                all_data.append(alarm_data)
-                
-            
-        # Сохраняем полученный список в JSON
+                    'enabled': widget.checkBox_2.isChecked()
+                })
         try:
-            data_to_json(all_data,'alarm_data.json')
-            print("Все будильники сохранены!")
+            data_to_json(all_data, self.path_alarm)
         except Exception as e:
-            print(f"Ошибка при сохранении: {e}")
+            print(f"Ошибка сохранения: {e}")
     
     def check_alarms(self):
         now = QtCore.QDateTime.currentDateTime()
@@ -582,31 +586,19 @@ class Window(QtWidgets.QWidget):
         weekday = now.date().dayOfWeek() - 1
         today = now.date().toString("yyyy-MM-dd")
         
-        for i in range(self.ui.verticalLayout_4A.count()):
-            widget = self.ui.verticalLayout_4A.itemAt(i).widget()
-            
-            if not isinstance(widget, AlarmWidget):
-                continue
-            
-            # if not widget.enabled:
-            #     continue
-            if not widget.checkBox_2.isChecked():
-                continue
-            
-            if not widget.week[weekday]:
+        # Используем findChildren для стабильности
+        for widget in self.findChildren(AlarmWidget):
+            if not widget.checkBox_2.isChecked() or not widget.week[weekday]:
                 continue
             
             if widget.time_al != current_time:
                 continue
             
+            # Проверка токена (чтобы не звенел каждую секунду в течение минуты)
             record = self.triggered_today.get(widget.id)
+            if record == (today, widget.trigger_token):
+                continue
             
-            if record:
-                last_date, last_token = record
-                if last_date == today and last_token == widget.trigger_token:
-                    continue
-            
-            # === СРАБОТАЛ ===
             self.triggered_today[widget.id] = (today, widget.trigger_token)
             self.trigger_alarm(widget)
     
