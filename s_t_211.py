@@ -252,8 +252,8 @@ class Ui_Dialog(object):
             i.hide()
         
         self.pushButton_Alarm.setStyleSheet("background-color: #57e389;")
-        self.pushButton_Timer.setStyleSheet("background-color: #f66151;")
-        self.pushButton_Sec.setStyleSheet("background-color: #f66151;")
+        self.pushButton_Timer.setStyleSheet("background-color: #d4e040;")
+        self.pushButton_Sec.setStyleSheet("background-color: #d4e040;")
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -284,16 +284,7 @@ class Ui_Dialog(object):
         self.label52.setText(_translate("Dialog", "Круги"))
         self.pushButton_Timer_music.setText(_translate("Dialog", "Остановить музыку"))
         self.pushButton_Alarm_add.setText(_translate("Dialog", "Добавить будильник"))
-        # self.label_name.setText(_translate("Dialog", "Название"))
-        # self.pushButton_ch_Alarm.setText(_translate("Dialog", "PushButton_ch_Alatm"))
-        # self.label_d1.setText(_translate("Dialog", "Пн"))
-        # self.label_d2.setText(_translate("Dialog", "Вт"))
-        # self.label_d3.setText(_translate("Dialog", "Ср"))
-        # self.label_d4.setText(_translate("Dialog", "Чт"))
-        # self.label_d5.setText(_translate("Dialog", "Пн"))
-        # self.label_d6.setText(_translate("Dialog", "Сб"))
-        # self.label_d7.setText(_translate("Dialog", "Вс"))
-        # self.pushButton_AlarmDel.setText(_translate("Dialog", "Удалить"))
+        
     
 if __name__ == "__main__":
     import sys

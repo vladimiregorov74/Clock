@@ -5,7 +5,7 @@ import sys
 import uuid
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtCore import QUrl
+from PyQt6.QtCore import QUrl, Qt
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 
 from data_in_to_json import data_from_json, data_to_json
@@ -16,6 +16,37 @@ import os
 
 # Получаем путь к папке скрипта для работы с файлами
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Глобальный стиль (Dark Modern Theme)
+STYLE_SHEET = """
+QWidget {
+    background-color: #f6f5f4;
+    color: #1a5fb4;
+}
+QPushButton {
+    background-color: #bad49d;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 16px;
+}
+QPushButton:hover {
+    background-color: #9a9996;
+    border-color: #57e389;
+    color: black;
+}
+QFrame#AlarmCard {
+    background-color: #1E1E1E;
+    border-radius: 12px;
+    border: 1px solid #2C2C2C;
+}
+QLabel#AlarmTime {
+    font-size: 32px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+"""
 
 class AlarmTriggeredDialog(QtWidgets.QDialog):
     stop_alarm = QtCore.pyqtSignal()
@@ -52,9 +83,9 @@ class AlarmTriggeredDialog(QtWidgets.QDialog):
         self.accept()
 
 
-class AlarmWidget(QtWidgets.QWidget):
+class AlarmWidget(QtWidgets.QFrame):
     alarm_updated = QtCore.pyqtSignal()
-    # Новый сигнал для уведомления об удалении
+    # сигнал для уведомления об удалении
     alarm_deleted = QtCore.pyqtSignal(str)
 
     def __init__(self, value, parent=None):
@@ -93,30 +124,66 @@ class AlarmWidget(QtWidgets.QWidget):
         self.pushButton_ch_Alarm.setFont(font)
         self.verticalLayout_Alarm.addWidget(self.pushButton_ch_Alarm)
         self.pushButton_ch_Alarm.clicked.connect(self.change_alarm)
-
         
-        # Слой для дней недели и кнопки удаления
+        # Дни недели (компактные кружочки)
         self.horizontalLayout_Alarm2 = QtWidgets.QHBoxLayout()
         self.day_labels_list = []
         days_texts = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
-        c = 0
-        for day in days_texts:
-            lbl = QtWidgets.QLabel(day)
-            lbl.setMinimumSize(QtCore.QSize(28, 0))
-            lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        for i, text in enumerate(days_texts):
+            lbl = QtWidgets.QLabel(text)
+            lbl.setFixedSize(24, 24)
+            lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            style = "border-radius: 12px; font-size: 16px; "
+            style += "background-color: gold; color: #000;" if self.week[
+                i] else "background-color: #333; color: white;"
+            lbl.setStyleSheet(style)
             self.horizontalLayout_Alarm2.addWidget(lbl)
-            if value['week_al'][c]:
-                lbl.setStyleSheet("background-color: green;")
-            else:
-                lbl.setStyleSheet("")
-            c += 1
             self.day_labels_list.append(lbl)
-            
+        
+        
+        # # Слой для дней недели и кнопки удаления
+        # self.horizontalLayout_Alarm2 = QtWidgets.QHBoxLayout()
+        # self.day_labels_list = []
+        # days_texts = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+        # c = 0
+        # for day in days_texts:
+        #     lbl = QtWidgets.QLabel(day)
+        #     lbl.setMinimumSize(QtCore.QSize(28, 0))
+        #     lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        #     self.horizontalLayout_Alarm2.addWidget(lbl)
+        #     if value['week_al'][c]:
+        #         lbl.setStyleSheet("background-color: green;")
+        #     else:
+        #         lbl.setStyleSheet("")
+        #     c += 1
+        #     self.day_labels_list.append(lbl)
         
         # Пружина (раздвигает дни и кнопку удаления)
         self.horizontalLayout_Alarm2.addStretch()
         
-        self.pushButton_AlarmDel = QtWidgets.QPushButton("Удалить")
+       
+        # self.pushButton_AlarmDel = QtWidgets.QPushButton("Удалить")
+        
+        self.pushButton_AlarmDel = QtWidgets.QPushButton("✕")
+        self.pushButton_AlarmDel.setFixedSize(30, 30)
+        # self.pushButton_AlarmDel.setStyleSheet("background-color: blue; color: white; border-radius: 14px;  font-size: 10px;")
+        self.pushButton_AlarmDel.setStyleSheet("""
+            QPushButton {
+                background-color: #333333; /* Темно-серый в покое */
+                color: #f66151;           /* Красный крестик */
+                border-radius: 15px;
+                padding: 0;
+                font-size: 18px;
+                border: none;
+            }
+            QPushButton:hover {
+                background-color: #f66151; /* Красный фон при наведении */
+                color: white;              /* Белый крестик при наведении */
+            }
+            QPushButton:pressed {
+                background-color: #d64d40; /* Темно-красный при клике */
+            }
+        """)
         self.horizontalLayout_Alarm2.addWidget(self.pushButton_AlarmDel)
         # Сразу подключаем удаление
         self.pushButton_AlarmDel.clicked.connect(self.del_later)
@@ -131,16 +198,18 @@ class AlarmWidget(QtWidgets.QWidget):
         self.checkBox_2 = QtWidgets.QCheckBox()
         
         self.checkBox_2.setChecked(value['enabled'])
+        self.checkBox_2.setStyleSheet("background-color: #57e389; color: #f66151; font-size: 28px;")
         self.checkBox_2.stateChanged.connect(self.on_enabled_changed)
         if value['enabled']:
             self.checkBox_2.setChecked(True)
+            self.checkBox_2.setStyleSheet("background-color: gold; color: red; font-size: 28px;")
         self.main_layout.addWidget(self.checkBox_2)
     
     def on_enabled_changed(self, state):
         self.enabled = self.checkBox_2.isChecked()
-        self.trigger_token += 1
+        self.trigger_token += 1  # Важно сбросывать токен, чтобы можно было включить снова
         self.alarm_updated.emit()
-
+    
     
     def del_later(self):
         # 1. Сначала скрываем виджет, чтобы он не мешался
@@ -178,10 +247,13 @@ class AlarmWidget(QtWidgets.QWidget):
         # 3. Обновляем подсветку дней недели через сохраненный список
         for i, lbl in enumerate(self.day_labels_list):
             if i < len(self.week):
-                if self.week[i]:
-                    lbl.setStyleSheet("background-color: green;")
-                else:
-                    lbl.setStyleSheet("")
+                
+                lbl.setFixedSize(24, 24)
+                lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                style = "border-radius: 12px; font-size: 16px; "
+                style += "background-color: gold; color: #000;" if self.week[
+                    i] else "background-color: #333; color: white;"
+                lbl.setStyleSheet(style)
         
                
         # 4. Сигнализируем окну Window, что пора сохранить изменения в файл
@@ -194,6 +266,7 @@ class AlarmWidget(QtWidgets.QWidget):
 class Window(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.setStyleSheet(STYLE_SHEET) # добавляем стили
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowMaximizeButtonHint)
@@ -292,13 +365,13 @@ class Window(QtWidgets.QWidget):
     # переход в окно секундомера
     def window_sec(self):
         
-        print("секундомера")
+        print("секундомер")
         for i in self.ui.list_timer_widget:
             i.hide()
-        self.ui.pushButton_Timer.setStyleSheet("background-color: #f66151;")
+        self.ui.pushButton_Timer.setStyleSheet("background-color: #d4e040;")
         for i in self.ui.list_alarm_widget:
             i.hide()
-        self.ui.pushButton_Alarm.setStyleSheet("background-color: #f66151;")
+        self.ui.pushButton_Alarm.setStyleSheet("background-color: #d4e040;")
         
         for i in self.ui.list_sec_widget:
             i.show()
@@ -312,13 +385,13 @@ class Window(QtWidgets.QWidget):
     
     # переход в окно таймера
     def window_timer(self):
-        
+        print("Таймер")
         for i in self.ui.list_sec_widget:
             i.hide()
-        self.ui.pushButton_Sec.setStyleSheet("background-color: #f66151;")
+        self.ui.pushButton_Sec.setStyleSheet("background-color: #d4e040;")
         for i in self.ui.list_alarm_widget:
             i.hide()
-        self.ui.pushButton_Alarm.setStyleSheet("background-color: #f66151;")
+        self.ui.pushButton_Alarm.setStyleSheet("background-color: #d4e040;")
         for i in self.ui.list_timer_widget:
             i.show()
         self.ui.pushButton_Timer.setStyleSheet("background-color: #57e389;")
@@ -333,12 +406,13 @@ class Window(QtWidgets.QWidget):
     
     # переход в окно будильника
     def window_alarm(self):
+        print("Будильник")
         for i in self.ui.list_sec_widget:
             i.hide()
-        self.ui.pushButton_Sec.setStyleSheet("background-color: #f66151;")
+        self.ui.pushButton_Sec.setStyleSheet("background-color: #d4e040;")
         for i in self.ui.list_timer_widget:
             i.hide()
-        self.ui.pushButton_Timer.setStyleSheet("background-color: #f66151;")
+        self.ui.pushButton_Timer.setStyleSheet("background-color: #d4e040;")
         for i in self.ui.list_alarm_widget:
             i.show()
         self.ui.pushButton_Alarm.setStyleSheet("background-color: #57e389;")
@@ -554,6 +628,7 @@ class Window(QtWidgets.QWidget):
         alarm.alarm_deleted.connect(self.cleanup_triggered_cache)
         # Вставляем перед распоркой (которая у вас в verticalLayout_4A)
         self.ui.verticalLayout_4A.insertWidget(0, alarm)
+        # сохраняем будильник
         self.save_all_alarms()
         
     def cleanup_triggered_cache(self, alarm_id):
@@ -566,7 +641,7 @@ class Window(QtWidgets.QWidget):
         # findChildren надежнее, чем перебор layout.count()
         for widget in self.findChildren(AlarmWidget):
             # Проверяем, не помечен ли виджет на удаление
-            if widget.isVisible():
+            if widget:
                 all_data.append({
                     'id': widget.id,
                     'name_al': widget.name_alarm,
@@ -586,21 +661,32 @@ class Window(QtWidgets.QWidget):
         weekday = now.date().dayOfWeek() - 1
         today = now.date().toString("yyyy-MM-dd")
         
-        # Используем findChildren для стабильности
         for widget in self.findChildren(AlarmWidget):
-            if not widget.checkBox_2.isChecked() or not widget.week[weekday]:
+            if not widget.checkBox_2.isChecked():
                 continue
             
-            if widget.time_al != current_time:
+            # Проверяем: если дни недели не выбраны, то считаем это "одноразовым" будильником
+            # и пропускаем проверку конкретного дня недели
+            has_days = any(widget.week)
+            
+            if has_days and not widget.week[weekday]:
                 continue
             
-            # Проверка токена (чтобы не звенел каждую секунду в течение минуты)
-            record = self.triggered_today.get(widget.id)
-            if record == (today, widget.trigger_token):
-                continue
-            
-            self.triggered_today[widget.id] = (today, widget.trigger_token)
-            self.trigger_alarm(widget)
+            if widget.time_al == current_time:
+                record = self.triggered_today.get(widget.id)
+                if record == (today, widget.trigger_token):
+                    continue
+                
+                # Помечаем как сработавший
+                self.triggered_today[widget.id] = (today, widget.trigger_token)
+                
+                # Если это был одноразовый будильник (дни не выбраны), выключаем его
+                if not has_days:
+                    widget.checkBox_2.setChecked(False)
+                    # Это автоматически вызовет сохранение, так как сигнал
+                    # stateChanged подключен к save_all_alarms через alarm_updated
+                
+                self.trigger_alarm(widget)
     
     def trigger_alarm(self, alarm: AlarmWidget):
         print(f"⏰ Будильник: {alarm.name_alarm}")
