@@ -57,6 +57,21 @@ class AlarmTriggeredDialog(QtWidgets.QDialog):
         self.stop_alarm.emit()
         self.accept()
 
+
+# Класс окна оповещения для таймера
+class TimerTriggeredDialog(AlarmTriggeredDialog):
+    def __init__(self, timer_name, info_text, parent=None):
+        super().__init__(timer_name, info_text, parent)
+        self.setWindowTitle("Таймер")
+        
+        # Находим label с иконкой и меняем текст
+        # В родительском классе это первый виджет в layout
+        for i in range(self.layout().count()):
+            widget = self.layout().itemAt(i).widget()
+            if isinstance(widget, QtWidgets.QLabel) and "⏰" in widget.text():
+                widget.setText("⏳ Время вышло!")
+                break
+
 # класс виджета будильника
 class AlarmWidget(QtWidgets.QFrame):
     alarm_updated = QtCore.pyqtSignal()
@@ -375,33 +390,49 @@ class Window(QtWidgets.QWidget):
                                        QtWidgets.QSizePolicy.Policy.Expanding)
         self.ui.verticalLayout.invalidate()
         
-    
-    # реализация таймера, с изменением надписей кнопок и их заморозки
-    # def start_stop_timer(self):
-    #     if not self.timer.isActive():
-    #         self.timer.start(1000)
-    #         self.ui.pushButton_Timer_start_stop.setText('Остановить')
-    #         self.ui.pushButton_Timer_reset.setEnabled(False)
-    #         self.ui.pushButton_Timer_setTimer.setEnabled(False)
-    #     else:
-    #         self.timer.stop()
-    #         self.ui.pushButton_Timer_start_stop.setText('Старт')
-    #         self.ui.pushButton_Timer_reset.setEnabled(True)
-    #         self.ui.pushButton_Timer_setTimer.setEnabled(True)
+        
     def start_stop_timer(self):
         if not self.timer.isActive():
             self.timer.start(1000)
             self.ui.pushButton_Timer_start_stop.setText('Остановить')
             self.ui.pushButton_Timer_reset.setEnabled(False)
-            # Блокируем кнопку настроек при старте
-            self.ui.pushButton_Timer_setTimer.setEnabled(False)
+            self.ui.pushButton_Timer_setTimer.setEnabled(False)  # Блокируем настройки
         else:
             self.timer.stop()
             self.ui.pushButton_Timer_start_stop.setText('Старт')
             self.ui.pushButton_Timer_reset.setEnabled(True)
-            # Разблокируем кнопку настроек при остановке
-            self.ui.pushButton_Timer_setTimer.setEnabled(True)
-    #
+            self.ui.pushButton_Timer_setTimer.setEnabled(True)  # Разблокируем настройки
+    
+    def on_timeout(self):
+        # проверяем условие останова таймера
+        if self.timer_set == 0:
+            self.timer.stop()
+            
+            # Разблокируем элементы управления
+            self.ui.pushButton_Timer_start_stop.setText('Старт')
+            self.ui.pushButton_Timer_reset.setEnabled(True)
+            self.ui.pushButton_Timer_setTimer.setEnabled(True)  # Кнопка снова доступна
+            self.ui.pushButton_Timer_start_stop.setEnabled(False)
+            
+            # Воспроизводим сигнал
+            file_path: str = self.path_music
+            self.player.setSource(QUrl.fromLocalFile(file_path))
+            self.audio_output.setVolume(50)
+            self.player.play()
+            
+            # Показываем новое окно таймера
+            dialog = TimerTriggeredDialog(
+                timer_name="Таймер",
+                info_text="Заданный интервал времени истек",
+                parent=self
+            )
+            dialog.stop_alarm.connect(self.music_stop)
+            dialog.exec()
+        
+        else:
+            self.timer_set = self.timer_set - 1
+            self.calc_time()
+    
     def calc_time(self):
         # вычисляем часы, минути, секунды
         self.h = self.timer_set // 3600
