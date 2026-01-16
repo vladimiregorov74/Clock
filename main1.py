@@ -127,9 +127,7 @@ class AlarmWidget(QtWidgets.QFrame):
         self.day_labels_list = []
         days_texts = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         # Для дней недели (они в цикле)
-        # Мы дадим им общий класс стиля позже через QSS или имя
-        # for lbl in self.day_labels_list:
-        #     lbl.setObjectName("DayCircle")
+        
         for i, text in enumerate(days_texts):
             lbl = QtWidgets.QLabel(text)
             lbl.setFixedSize(24, 24)
