@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
-import sys
+
 import uuid
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -10,9 +9,8 @@ from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 
 from data_in_to_json import data_from_json, data_to_json
 from s_t_211 import Ui_Dialog  # импорт основного окна
-# from sec2 import Ui_Form
-from newsettimer import Ui_Form
-from addAlarm import U_Dialog
+from newsettimer import Ui_Form  # импорт окна задания таймера
+from addAlarm import U_Dialog  # импорт окна задания будильника
 import os
 
 # Получаем путь к папке скрипта для работы с файлами
@@ -23,6 +21,8 @@ def load_stylesheet(path):
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
+
+# класс окна оповещения сработавшего будильника
 class AlarmTriggeredDialog(QtWidgets.QDialog):
     stop_alarm = QtCore.pyqtSignal()
 
@@ -57,7 +57,7 @@ class AlarmTriggeredDialog(QtWidgets.QDialog):
         self.stop_alarm.emit()
         self.accept()
 
-
+# класс виджета будильника
 class AlarmWidget(QtWidgets.QFrame):
     alarm_updated = QtCore.pyqtSignal()
     # сигнал для уведомления об удалении
@@ -69,7 +69,6 @@ class AlarmWidget(QtWidgets.QFrame):
         # Для самой карточки
         self.setObjectName("AlarmCard")
         
-        self.id = value["id"]
         self.id = value["id"]
         self.name_alarm = value['name_al']
         self.time_al = value['time_al']
@@ -158,12 +157,13 @@ class AlarmWidget(QtWidgets.QFrame):
             self.checkBox_2.setStyleSheet("background-color: gold; color: red;")
         self.main_layout.addWidget(self.checkBox_2)
     
+    # ставим галочку - будильник активирован
     def on_enabled_changed(self, state):
         self.enabled = self.checkBox_2.isChecked()
         self.trigger_token += 1  # Важно сбросывать токен, чтобы можно было включить снова
         self.alarm_updated.emit()
     
-    
+    # удаление виджета будильника
     def del_later(self):
         # 1. Сначала скрываем виджет, чтобы он не мешался
         self.hide()
@@ -207,11 +207,9 @@ class AlarmWidget(QtWidgets.QFrame):
                 style += "background-color: gold; color: #000;" if self.week[
                     i] else "background-color: #333; color: white;"
                 lbl.setStyleSheet(style)
-        
                
         # 4. Сигнализируем окну Window, что пора сохранить изменения в файл
         self.alarm_updated.emit()
-        
        
         
         
@@ -351,7 +349,7 @@ class Window(QtWidgets.QWidget):
         for i in self.ui.list_timer_widget:
             i.show()
         self.ui.pushButton_Timer.setStyleSheet("background-color: #57e389;")
-        # скрыть кнопку останов музыки
+        # # скрыть кнопку останов музыки
         self.ui.pushButton_Timer_music.hide()
         for i in self.label_Secs:
             i.hide()
@@ -379,16 +377,29 @@ class Window(QtWidgets.QWidget):
         
     
     # реализация таймера, с изменением надписей кнопок и их заморозки
+    # def start_stop_timer(self):
+    #     if not self.timer.isActive():
+    #         self.timer.start(1000)
+    #         self.ui.pushButton_Timer_start_stop.setText('Остановить')
+    #         self.ui.pushButton_Timer_reset.setEnabled(False)
+    #         self.ui.pushButton_Timer_setTimer.setEnabled(False)
+    #     else:
+    #         self.timer.stop()
+    #         self.ui.pushButton_Timer_start_stop.setText('Старт')
+    #         self.ui.pushButton_Timer_reset.setEnabled(True)
+    #         self.ui.pushButton_Timer_setTimer.setEnabled(True)
     def start_stop_timer(self):
         if not self.timer.isActive():
             self.timer.start(1000)
             self.ui.pushButton_Timer_start_stop.setText('Остановить')
             self.ui.pushButton_Timer_reset.setEnabled(False)
+            # Блокируем кнопку настроек при старте
             self.ui.pushButton_Timer_setTimer.setEnabled(False)
         else:
             self.timer.stop()
             self.ui.pushButton_Timer_start_stop.setText('Старт')
             self.ui.pushButton_Timer_reset.setEnabled(True)
+            # Разблокируем кнопку настроек при остановке
             self.ui.pushButton_Timer_setTimer.setEnabled(True)
     #
     def calc_time(self):
@@ -403,27 +414,59 @@ class Window(QtWidgets.QWidget):
     
     
     # реализация отображения значений таймера и проверки условия останова
+    # def on_timeout(self):
+    #
+    #     # проверяем условие останова таймер
+    #     if self.timer_set == 0:
+    #         self.timer.stop()
+    #         self.ui.pushButton_Timer.click()  # нажатием на кнопку переходим в окно таймера
+    #         self.ui.pushButton_Timer_start_stop.setText('Старт')
+    #         self.ui.pushButton_Timer_reset.setEnabled(True)
+    #         self.ui.pushButton_Timer_setTimer.setEnabled(True)
+    #         self.ui.pushButton_Timer_setTimer.hide()  # скрываем кнопку настроек, для вывода кнопки останова сигнала
+    #         self.ui.pushButton_Timer_music.show()
+    #         self.ui.pushButton_Timer_start_stop.setEnabled(False)
+    #         # воспроизводим сигнал (при достижении таймером 0)
+    #         file_path: str = self.path_music
+    #         self.player.setAudioOutput(self.audio_output)
+    #         self.player.setSource(QUrl.fromLocalFile(file_path))
+    #         self.audio_output.setVolume(50)
+    #         self.player.play()  # Воспроизведение аудио
+    #
+    #     else:
+    #         self.timer_set = self.timer_set - 1  # уменьшаем таймер на 1
+    #         self.calc_time()
+    
     def on_timeout(self):
-        
-        # проверяем условие останова таймер
         if self.timer_set == 0:
             self.timer.stop()
-            self.ui.pushButton_Timer.click()  # нажатием на кнопку переходим в окно таймера
+            
+            # Сбрасываем состояние кнопок управления
             self.ui.pushButton_Timer_start_stop.setText('Старт')
             self.ui.pushButton_Timer_reset.setEnabled(True)
             self.ui.pushButton_Timer_setTimer.setEnabled(True)
-            self.ui.pushButton_Timer_setTimer.hide()  # скрываем кнопку настроек, для вывода кнопки останова сигнала
-            self.ui.pushButton_Timer_music.show()
             self.ui.pushButton_Timer_start_stop.setEnabled(False)
-            # воспроизводим сигнал (при достижении таймером 0)
-            file_path: str = self.path_music
-            self.player.setAudioOutput(self.audio_output)
+            
+            # Воспроизводим музыку
+            file_path = self.path_music
             self.player.setSource(QUrl.fromLocalFile(file_path))
             self.audio_output.setVolume(50)
-            self.player.play()  # Воспроизведение аудио
+            self.player.play()
+            
+            # Вызываем окно оповещения (используем тот же класс, что и для будильника)
+            # Если хотите другой заголовок, можно создать отдельный класс или добавить аргумент
+            dialog = AlarmTriggeredDialog(
+                alarm_name="Время вышло!",
+                alarm_time="Таймер завершен",
+                parent=self
+            )
+            dialog.setWindowTitle("Таймер")
+            # При нажатии "Остановить" в окне — музыка выключается
+            dialog.stop_alarm.connect(self.music_stop)
+            dialog.exec()
         
         else:
-            self.timer_set = self.timer_set - 1  # уменьшаем таймер на 1
+            self.timer_set -= 1
             self.calc_time()
             
     
@@ -447,7 +490,7 @@ class Window(QtWidgets.QWidget):
         dialog.exec()
         self.setEnabled(True)
     
-    # получение данных из модального окна
+    # получение данных из модального окна установок таймера
     def handle_value_selected(self, value):
         
         self.h, self.m, self.s, self.path_music = int(value[0]), int(value[1]), int(value[2]), value[3]
@@ -465,14 +508,22 @@ class Window(QtWidgets.QWidget):
             print(e)
     
     # Останов музыки
+    # def music_stop(self):
+    #     self.player.stop()
+    #     self.ui.pushButton_Timer_setTimer.show()  # скрываем кнопку настроек, для вывода кнопки останова сигнала
+    #     self.ui.pushButton_Timer_music.hide()
+    #     if self.fist_timer_set > 0:
+    #         self.timer_set = self.fist_timer_set
+    #         self.calc_time()
+    #         # Делаем кнопку активной
+    #         self.ui.pushButton_Timer_start_stop.setEnabled(True)
+    
     def music_stop(self):
         self.player.stop()
-        self.ui.pushButton_Timer_setTimer.show()  # скрываем кнопку настроек, для вывода кнопки останова сигнала
-        self.ui.pushButton_Timer_music.hide()
-        if self.fist_timer_set > 0:
+        # Возвращаем начальное время, если нужно
+        if hasattr(self, 'fist_timer_set') and self.fist_timer_set > 0:
             self.timer_set = self.fist_timer_set
             self.calc_time()
-            # Делаем кнопку активной
             self.ui.pushButton_Timer_start_stop.setEnabled(True)
     
     # реализация секундомера, с изменением надписей кнопок и их заморозки
