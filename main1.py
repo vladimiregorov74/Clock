@@ -10,43 +10,18 @@ from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 
 from data_in_to_json import data_from_json, data_to_json
 from s_t_211 import Ui_Dialog  # импорт основного окна
-from sec2 import Ui_Form
+# from sec2 import Ui_Form
+from newsettimer import Ui_Form
 from addAlarm import U_Dialog
 import os
 
 # Получаем путь к папке скрипта для работы с файлами
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Глобальный стиль (Dark Modern Theme)
-STYLE_SHEET = """
-QWidget {
-    background-color: #f6f5f4;
-    color: #1a5fb4;
-}
-QPushButton {
-    background-color: #bad49d;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 16px;
-}
-QPushButton:hover {
-    background-color: #9a9996;
-    border-color: #57e389;
-    color: black;
-}
-QFrame#AlarmCard {
-    background-color: #1E1E1E;
-    border-radius: 12px;
-    border: 1px solid #2C2C2C;
-}
-QLabel#AlarmTime {
-    font-size: 32px;
-    font-weight: bold;
-    color: #FFFFFF;
-}
 
-"""
+def load_stylesheet(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
 
 class AlarmTriggeredDialog(QtWidgets.QDialog):
     stop_alarm = QtCore.pyqtSignal()
@@ -90,6 +65,10 @@ class AlarmWidget(QtWidgets.QFrame):
 
     def __init__(self, value, parent=None):
         super().__init__(parent)
+        #  Задаем имя для QSS
+        # Для самой карточки
+        self.setObjectName("AlarmCard")
+        
         self.id = value["id"]
         self.id = value["id"]
         self.name_alarm = value['name_al']
@@ -116,6 +95,8 @@ class AlarmWidget(QtWidgets.QFrame):
         self.label_name_2 = QtWidgets.QLabel(value['name_al'])
         self.label_name_2.setMinimumSize(QtCore.QSize(355, 0))
         self.label_name_2.setMaximumSize(QtCore.QSize(355, 16777215))
+        # Для названия (надпись сверху)
+        self.label_name_2.setObjectName("AlarmName")
         self.verticalLayout_Alarm.addWidget(self.label_name_2)
         
         self.pushButton_ch_Alarm = QtWidgets.QPushButton(value['time_al'])
@@ -124,11 +105,17 @@ class AlarmWidget(QtWidgets.QFrame):
         self.pushButton_ch_Alarm.setFont(font)
         self.verticalLayout_Alarm.addWidget(self.pushButton_ch_Alarm)
         self.pushButton_ch_Alarm.clicked.connect(self.change_alarm)
+        # Для кнопки со временем
+        self.pushButton_ch_Alarm.setObjectName("AlarmTime")
         
         # Дни недели (компактные кружочки)
         self.horizontalLayout_Alarm2 = QtWidgets.QHBoxLayout()
         self.day_labels_list = []
         days_texts = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+        # Для дней недели (они в цикле)
+        # Мы дадим им общий класс стиля позже через QSS или имя
+        # for lbl in self.day_labels_list:
+        #     lbl.setObjectName("DayCircle")
         for i, text in enumerate(days_texts):
             lbl = QtWidgets.QLabel(text)
             lbl.setFixedSize(24, 24)
@@ -139,51 +126,15 @@ class AlarmWidget(QtWidgets.QFrame):
             lbl.setStyleSheet(style)
             self.horizontalLayout_Alarm2.addWidget(lbl)
             self.day_labels_list.append(lbl)
-        
-        
-        # # Слой для дней недели и кнопки удаления
-        # self.horizontalLayout_Alarm2 = QtWidgets.QHBoxLayout()
-        # self.day_labels_list = []
-        # days_texts = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
-        # c = 0
-        # for day in days_texts:
-        #     lbl = QtWidgets.QLabel(day)
-        #     lbl.setMinimumSize(QtCore.QSize(28, 0))
-        #     lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        #     self.horizontalLayout_Alarm2.addWidget(lbl)
-        #     if value['week_al'][c]:
-        #         lbl.setStyleSheet("background-color: green;")
-        #     else:
-        #         lbl.setStyleSheet("")
-        #     c += 1
-        #     self.day_labels_list.append(lbl)
-        
+            
         # Пружина (раздвигает дни и кнопку удаления)
         self.horizontalLayout_Alarm2.addStretch()
         
-       
-        # self.pushButton_AlarmDel = QtWidgets.QPushButton("Удалить")
-        
+        # Кнопка удалить будильник
         self.pushButton_AlarmDel = QtWidgets.QPushButton("✕")
         self.pushButton_AlarmDel.setFixedSize(30, 30)
-        # self.pushButton_AlarmDel.setStyleSheet("background-color: blue; color: white; border-radius: 14px;  font-size: 10px;")
-        self.pushButton_AlarmDel.setStyleSheet("""
-            QPushButton {
-                background-color: #333333; /* Темно-серый в покое */
-                color: #f66151;           /* Красный крестик */
-                border-radius: 15px;
-                padding: 0;
-                font-size: 18px;
-                border: none;
-            }
-            QPushButton:hover {
-                background-color: #f66151; /* Красный фон при наведении */
-                color: white;              /* Белый крестик при наведении */
-            }
-            QPushButton:pressed {
-                background-color: #d64d40; /* Темно-красный при клике */
-            }
-        """)
+        # Для кнопки удаления задаем имя используемое в стилях
+        self.pushButton_AlarmDel.setObjectName("AlarmDel")
         self.horizontalLayout_Alarm2.addWidget(self.pushButton_AlarmDel)
         # Сразу подключаем удаление
         self.pushButton_AlarmDel.clicked.connect(self.del_later)
@@ -196,13 +147,15 @@ class AlarmWidget(QtWidgets.QFrame):
         self.main_layout.addSpacing(20)
         
         self.checkBox_2 = QtWidgets.QCheckBox()
-        
+        # Для стилей задаем имя чекбокса
+        self.checkBox_2.setObjectName("AlarmCheck")
         self.checkBox_2.setChecked(value['enabled'])
-        self.checkBox_2.setStyleSheet("background-color: #57e389; color: #f66151; font-size: 28px;")
+       
+        
         self.checkBox_2.stateChanged.connect(self.on_enabled_changed)
         if value['enabled']:
             self.checkBox_2.setChecked(True)
-            self.checkBox_2.setStyleSheet("background-color: gold; color: red; font-size: 28px;")
+            self.checkBox_2.setStyleSheet("background-color: gold; color: red;")
         self.main_layout.addWidget(self.checkBox_2)
     
     def on_enabled_changed(self, state):
@@ -266,7 +219,10 @@ class AlarmWidget(QtWidgets.QFrame):
 class Window(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
-        self.setStyleSheet(STYLE_SHEET) # добавляем стили
+        # Загружаем и применяем стиль
+        style_path = os.path.join(BASE_DIR, "style.qss")
+        if os.path.exists(style_path):
+            self.setStyleSheet(load_stylesheet(style_path))
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowMaximizeButtonHint)
@@ -494,7 +450,7 @@ class Window(QtWidgets.QWidget):
     # получение данных из модального окна
     def handle_value_selected(self, value):
         
-        self.h, self.m, self.s, self.path_music = value
+        self.h, self.m, self.s, self.path_music = int(value[0]), int(value[1]), int(value[2]), value[3]
         self.ui.label_h.setText(str(self.h))
         self.ui.label_min.setText(str(self.m))
         self.ui.label_sec.setText(str(self.s))
@@ -593,11 +549,20 @@ class Window(QtWidgets.QWidget):
                 
                 # Создаем строку круга
                 aa = self.sec_s + self.sec_0 / 10
-                text = f"{self.sec_h:02}:{self.sec_m:02}:{aa:04.1f}  |  {h_r:02}:{m_r:02}:{s_r:04.1f}  |  №{i}"
+                # text = f"{self.sec_h:02}:{self.sec_m:02}:{aa:04.1f}  |  {h_r:02}:{m_r:02}:{s_r:04.1f}  |  №{i}"
+                text = (
+                    f"<pre>"
+                    f" {self.sec_h:02}:{self.sec_m:02}:{aa:04.1f}  |  "
+                    f" {h_r:02}:{m_r:02}:{s_r:04.1f}  |     №{i}"
+                    f"</pre>"
+                )
                 
                 new_label = QtWidgets.QLabel(text)
-                new_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                new_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
                 new_label.setStyleSheet("border-bottom: 1px solid #ddd; padding: 5px;")  # Добавим разделитель
+                font = QtGui.QFont("Monospace")
+                font.setStyleHint(QtGui.QFont.StyleHint.Monospace)
+                new_label.setFont(font)
                 
                 # Добавляем в слой ВНУТРИ ScrollArea
                 # insertWidget(0, ...) добавит новый круг В НАЧАЛО списка (сверху)

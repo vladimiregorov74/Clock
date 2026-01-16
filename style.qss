@@ -1,0 +1,87 @@
+/* style.qss */
+
+QWidget {
+    background-color: #f6f5f4;
+    color: #1a5fb4;
+    font:"Monospace";
+}
+QPushButton {
+    background-color: #bad49d;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 16px;
+}
+QPushButton:hover {
+    background-color: #9a9996;
+    border-color: red;
+    color: black;
+}
+QFrame#AlarmCard {
+    background-color: #1E1E1E;
+    border-radius: 12px;
+    border: 1px solid #2C2C2C;
+}
+QLabel#AlarmTime {
+    font-size: 32px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+/* Вся карточка */
+QFrame#AlarmCard {
+    background-color: #9a9996;
+    border-radius: 12px;
+}
+
+
+
+/* Название будильника */
+QLabel#AlarmName {
+    color: #888888;
+    font-size: 18px;
+}
+
+/* Кнопка времени */
+QPushButton#AlarmTime {
+    background: transparent;
+    border: none;
+    color: #FFFFFF;
+    font-size: 32px;
+    text-align: left;
+}
+QPushButton#AlarmTime:hover {
+    color: gold;
+}
+
+
+
+/* Кнопка удаления не активна*/
+QPushButton#AlarmDel {
+    background-color: #333333; /* Темно-серый в покое */
+    color: #f66151;           /* Красный крестик */
+    border-radius: 15px;
+    padding: 0;
+    font-size: 18px;
+    border: none;
+}
+
+/* Кнопка удаления при наведении*/
+QPushButton#AlarmDel:hover {
+     background-color: #f66151; /* Красный фон при наведении */
+     color: white;              /* Белый крестик при наведении */
+}
+
+/* Кнопка удаления при наведении*/
+QPushButton#AlarmDel:pressed {
+    background-color: #d64d40; /* Темно-красный при клике */
+}
+
+
+/* Чекбокс */
+QCheckBox#AlarmCheck {
+    background-color: #57e389;
+    color: #f66151;
+}
+
+
