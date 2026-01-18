@@ -1,4 +1,4 @@
-# Сурогат
+# Основное окно программы
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -229,10 +229,7 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
         
         self.list_alarm_widget = [self.pushButton_Alarm_add, self.scrollArea_Alarm, self.scrollAreaWidgetContents_Alarm]
-        # self.list_alarm_widget = [self.pushButton_Alarm_add, self.scrollArea_Alarm, self.scrollAreaWidgetContents_Alarm,
-        #                           self.label_name,self.pushButton_ch_Alarm, self.label_d1, self.label_d2, self.label_d3,
-        #                           self.label_d4, self.label_d5, self.label_d6, self.label_d7, self.checkBox,
-        #                           self.pushButton_AlarmDel]
+        
         
         self.list_sec_widget = [self.label_Sec_h_2, self.label_Sec_h, self.label_Sec_min_2,
                                 self.label_Sec_min, self.label_Sec_sec_2, self.label_Sec_sec,

@@ -6,7 +6,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import QUrl
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 # from sec import Ui_Dialog  # импорт основного окна
-from s_t_21 import Ui_Dialog  # импорт основного окна
+from a_t_s_1 import Ui_Dialog  # импорт основного окна
 from sec2 import Ui_Form
 import os
 

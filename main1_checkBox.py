@@ -11,6 +11,7 @@ from data_in_to_json import data_from_json, data_to_json
 from a_t_s import Ui_Dialog  # импорт основного окна
 from newsettimer import Ui_Form  # импорт окна задания таймера
 from addAlarm import U_Dialog  # импорт окна задания будильника
+from btnCheck import ClickableForm
 import os
 
 # Получаем путь к папке скрипта для работы с файлами
@@ -163,9 +164,10 @@ class AlarmWidget(QtWidgets.QFrame):
         self.main_layout.addLayout(self.verticalLayout_Alarm)
         
         # Отступ перед чекбоксом
-        self.main_layout.addSpacing(20)
+        # self.main_layout.addSpacing(20)
         
-        self.checkBox_2 = QtWidgets.QCheckBox()
+        self.checkBox_2 = ClickableForm()
+        self.checkBox_2.setScale(0.7, 0.6)
         # Для стилей задаем имя чекбокса
         self.checkBox_2.setObjectName("AlarmCheck")
         self.checkBox_2.setChecked(value['enabled'])
