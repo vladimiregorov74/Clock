@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+"""Для отображения иконки делаем cp ~/Рабочий\ стол/Alarm.desktop ~/.local/share/applications/"""
 import uuid
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -16,6 +16,8 @@ import os
 
 # Получаем путь к папке скрипта для работы с файлами
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Склеиваем путь к папке с именем файла иконки
+ICON_PATH = os.path.join(BASE_DIR, 'icon.png')
 
 
 def load_stylesheet(path):
@@ -73,6 +75,20 @@ class TimerTriggeredDialog(AlarmTriggeredDialog):
                 widget.setText("⏳ Время вышло!")
                 break
 
+
+#   класс делающий лейбелы будильника кликабельными
+class ClickableLabel(QtWidgets.QLabel):
+    clicked = QtCore.pyqtSignal(int)  # будем передавать индекс дня
+
+    def __init__(self, index, text, parent=None):
+        super().__init__(text, parent)
+        self.index = index
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            self.clicked.emit(self.index)
+            
+            
 # класс виджета будильника
 class AlarmWidget(QtWidgets.QFrame):
     alarm_updated = QtCore.pyqtSignal()
@@ -106,8 +122,8 @@ class AlarmWidget(QtWidgets.QFrame):
         
         # 2. Вложенные слои создаем БЕЗ self
         self.verticalLayout_Alarm = QtWidgets.QVBoxLayout()
-        
-        self.label_name_2 = QtWidgets.QLabel(value['name_al'])
+        self.label_name_2 = ClickableLabel(100, value['name_al'])  # 100 - заглушка
+        # self.label_name_2 = QtWidgets.QLabel(value['name_al'])
         self.label_name_2.setMinimumSize(QtCore.QSize(355, 0))
         self.label_name_2.setMaximumSize(QtCore.QSize(355, 16777215))
         self.label_name_2.setStyleSheet("""QLabel {
@@ -117,6 +133,7 @@ class AlarmWidget(QtWidgets.QFrame):
     padding: 8px 16px;
     font-size: 16px;
 }""")
+        self.label_name_2.clicked.connect(self.change_alarm)
         # Для названия (надпись сверху)
         self.label_name_2.setObjectName("AlarmName")
         self.verticalLayout_Alarm.addWidget(self.label_name_2)
@@ -137,13 +154,16 @@ class AlarmWidget(QtWidgets.QFrame):
         # Для дней недели (они в цикле)
         
         for i, text in enumerate(days_texts):
-            lbl = QtWidgets.QLabel(text)
+            lbl = ClickableLabel(i, text)
+            # lbl = QtWidgets.QLabel(text)
             lbl.setFixedSize(24, 24)
             lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
             style = "border-radius: 12px; font-size: 16px; "
             style += "background-color: gold; color: #000;" if self.week[
                 i] else "background-color: #333; color: white;"
             lbl.setStyleSheet(style)
+            # подключаем сигнал
+            lbl.clicked.connect(self.change_alarm)
             self.horizontalLayout_Alarm2.addWidget(lbl)
             self.day_labels_list.append(lbl)
             
@@ -173,7 +193,7 @@ class AlarmWidget(QtWidgets.QFrame):
         self.checkBox_2.setChecked(value['enabled'])
        
         
-        self.checkBox_2.stateChanged.connect(self.on_enabled_changed)
+        self.checkBox_2.toggled.connect(self.on_enabled_changed)
         if value['enabled']:
             self.checkBox_2.setChecked(True)
             self.checkBox_2.setStyleSheet("background-color: gold; color: red;")
