@@ -23,7 +23,7 @@ class ClickableForm(QtWidgets.QAbstractButton):
 
     BASE_WIDTH = 48
     BASE_HEIGHT = 22
-    BASE_RADIUS = 8
+    BASE_RADIUS = 9
     BASE_KNOB = 18
     BASE_MARGIN = 2
 
@@ -57,6 +57,10 @@ class ClickableForm(QtWidgets.QAbstractButton):
         self._update_size()
 
     # ---------- PUBLIC API ----------
+    
+    def nextCheckState(self):
+        self.setChecked(not self.isChecked())
+        
     # -------Метод изменения масштаба--------
 
     def setScale(self, sx: float, sy: float = None):
@@ -69,47 +73,40 @@ class ClickableForm(QtWidgets.QAbstractButton):
         self._scale_y = sy
         self._update_size()
         self.update()
-
-    # ---------- SIZE ----------
-    # ------Пересчёт размера виджета-------
-
+        
+    
     def _update_size(self):
         self.setFixedSize(
             int(self.BASE_WIDTH * self._scale_x),
             int(self.BASE_HEIGHT * self._scale_y),
         )
-
+    
     def sizeHint(self):
         return QtCore.QSize(
             int(self.BASE_WIDTH * self._scale_x),
             int(self.BASE_HEIGHT * self._scale_y),
         )
-
-    minimumSizeHint = sizeHint
-
-    # ---------- PAINT ----------
     
+    minimumSizeHint = sizeHint
+    
+    # ---------- PAINT ----------
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         
-        # --------- определяем состояние ---------
         pressed = self.isDown()
         hovered = self._hovered and not pressed
         
-        # --------- выбираем цвет фона ---------
         base_bg = self.color_on_bg if self.isChecked() else self.color_off_bg
         
         if pressed:
-            bg_color = self._adjust_color(base_bg, self.darker)  # темнее при нажатии
+            bg_color = self._adjust_color(base_bg, self.darker)
         elif hovered:
-            bg_color = self._adjust_color(base_bg, self.lighter)  # светлее при наведении
+            bg_color = self._adjust_color(base_bg, self.lighter)
         else:
             bg_color = base_bg
         
-        # =========================
-        # ФОН (масштабируется)
-        # =========================
+        # фон
         painter.save()
         painter.scale(self._scale_x, self._scale_y)
         
@@ -117,17 +114,11 @@ class ClickableForm(QtWidgets.QAbstractButton):
         painter.setPen(QtCore.Qt.PenStyle.NoPen)
         
         base_rect = QtCore.QRect(0, 0, self.BASE_WIDTH, self.BASE_HEIGHT)
-        painter.drawRoundedRect(
-            base_rect,
-            self.BASE_RADIUS,
-            self.BASE_RADIUS
-        )
+        painter.drawRoundedRect(base_rect, self.BASE_RADIUS, self.BASE_RADIUS)
         
         painter.restore()
         
-        # =========================
-        # БЕГУНОК (НЕ масштабируется)
-        # =========================
+        # бегунок
         w, h = self.width(), self.height()
         
         knob_d = min(
@@ -148,22 +139,22 @@ class ClickableForm(QtWidgets.QAbstractButton):
         painter.drawEllipse(knob_rect)
     
     # ---------- STATE ----------
-    # ---------- ЛОГИКА ----------
-
     def setChecked(self, checked: bool):
         if self.isChecked() == checked:
             return
-
+        
         super().setChecked(checked)
-
+        
         state = (
             QtCore.Qt.CheckState.Checked
             if checked
             else QtCore.Qt.CheckState.Unchecked
         )
+        
         self.stateChanged.emit(state)
         self.update()
     
+    # ---------- HOVER ----------
     def enterEvent(self, event):
         self._hovered = True
         self.update()
@@ -174,11 +165,122 @@ class ClickableForm(QtWidgets.QAbstractButton):
         self.update()
         super().leaveEvent(event)
     
+    # ---------- UTILS ----------
     def _adjust_color(self, color: QtGui.QColor, factor: float) -> QtGui.QColor:
         c = QtGui.QColor(color)
         if factor > 1.0:
             return c.lighter(int(factor * 100))
         return c.darker(int(100 / factor))
+
+    # # ---------- SIZE ----------
+    # # ------Пересчёт размера виджета-------
+    #
+    # def _update_size(self):
+    #     self.setFixedSize(
+    #         int(self.BASE_WIDTH * self._scale_x),
+    #         int(self.BASE_HEIGHT * self._scale_y),
+    #     )
+    #
+    # def sizeHint(self):
+    #     return QtCore.QSize(
+    #         int(self.BASE_WIDTH * self._scale_x),
+    #         int(self.BASE_HEIGHT * self._scale_y),
+    #     )
+    #
+    # minimumSizeHint = sizeHint
+    #
+    # # ---------- PAINT ----------
+    #
+    # def paintEvent(self, event):
+    #     painter = QtGui.QPainter(self)
+    #     painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+    #
+    #     # --------- определяем состояние ---------
+    #     pressed = self.isDown()
+    #     hovered = self._hovered and not pressed
+    #
+    #     # --------- выбираем цвет фона ---------
+    #     base_bg = self.color_on_bg if self.isChecked() else self.color_off_bg
+    #
+    #     if pressed:
+    #         bg_color = self._adjust_color(base_bg, self.darker)  # темнее при нажатии
+    #     elif hovered:
+    #         bg_color = self._adjust_color(base_bg, self.lighter)  # светлее при наведении
+    #     else:
+    #         bg_color = base_bg
+    #
+    #     # =========================
+    #     # ФОН (масштабируется)
+    #     # =========================
+    #     painter.save()
+    #     painter.scale(self._scale_x, self._scale_y)
+    #
+    #     painter.setBrush(bg_color)
+    #     painter.setPen(QtCore.Qt.PenStyle.NoPen)
+    #
+    #     base_rect = QtCore.QRect(0, 0, self.BASE_WIDTH, self.BASE_HEIGHT)
+    #     painter.drawRoundedRect(
+    #         base_rect,
+    #         self.BASE_RADIUS,
+    #         self.BASE_RADIUS
+    #     )
+    #
+    #     painter.restore()
+    #
+    #     # =========================
+    #     # БЕГУНОК (НЕ масштабируется)
+    #     # =========================
+    #     w, h = self.width(), self.height()
+    #
+    #     knob_d = min(
+    #         h - 2 * self.BASE_MARGIN,
+    #         int(self.BASE_KNOB * min(self._scale_x, self._scale_y))
+    #     )
+    #
+    #     y = (h - knob_d) // 2
+    #
+    #     if self.isChecked():
+    #         x = w - knob_d - self.BASE_MARGIN
+    #     else:
+    #         x = self.BASE_MARGIN
+    #
+    #     knob_rect = QtCore.QRect(x, y, knob_d, knob_d)
+    #
+    #     painter.setBrush(self.color_knob)
+    #     painter.drawEllipse(knob_rect)
+    #
+    # # ---------- STATE ----------
+    # # ---------- ЛОГИКА ----------
+    #
+    # def setChecked(self, checked: bool):
+    #     if self.isChecked() == checked:
+    #         return
+    #
+    #     super().setChecked(checked)
+    #
+    #     state = (
+    #         QtCore.Qt.CheckState.Checked
+    #         if checked
+    #         else QtCore.Qt.CheckState.Unchecked
+    #     )
+    #     self.stateChanged.emit(state)
+    #     self.update()
+    #
+    # def enterEvent(self, event):
+    #     self._hovered = True
+    #     self.update()
+    #     super().enterEvent(event)
+    #
+    # def leaveEvent(self, event):
+    #     self._hovered = False
+    #     self.update()
+    #     super().leaveEvent(event)
+    #
+    # def _adjust_color(self, color: QtGui.QColor, factor: float) -> QtGui.QColor:
+    #     c = QtGui.QColor(color)
+    #     if factor > 1.0:
+    #         return c.lighter(int(factor * 100))
+    #     return c.darker(int(100 / factor))
 
     
 

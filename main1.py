@@ -75,6 +75,8 @@ class TimerTriggeredDialog(AlarmTriggeredDialog):
                 widget.setText("⏳ Время вышло!")
                 break
                 
+                
+#   класс делающий лейбелы будильника кликабельными
 class ClickableLabel(QtWidgets.QLabel):
     clicked = QtCore.pyqtSignal(int)  # будем передавать индекс дня
 
@@ -669,7 +671,7 @@ class Window(QtWidgets.QWidget):
         alarm.alarm_updated.connect(self.save_all_alarms)
         # Подключаем очистку кэша при удалении
         alarm.alarm_deleted.connect(self.cleanup_triggered_cache)
-        # Вставляем перед распоркой (которая у вас в verticalLayout_4A)
+        # Вставляем перед распоркой (которая в verticalLayout_4A)
         self.ui.verticalLayout_4A.insertWidget(0, alarm)
         # сохраняем будильник
         self.save_all_alarms()

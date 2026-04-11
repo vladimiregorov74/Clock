@@ -260,7 +260,7 @@ class U_Dialog(QDialog):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         
-        Dialog.setWindowTitle(_translate("Dialog", "Добавление будильника"))
+        Dialog.setWindowTitle(_translate("Dialog", "Добавить/редактировать будильник"))
         self.label.setText(_translate("Dialog", "Установить будильник"))
         self.lineEdit.setText(_translate("Dialog", self.name_alarm))
         self.lineEdit.setStyleSheet("""QLineEdit{
@@ -277,10 +277,11 @@ class U_Dialog(QDialog):
         self.pushButton_9.setText(_translate("Dialog", "+"))
         self.pushButton_9.setStyleSheet("""QPushButton {
     background-color: #bad49d;
+    color: #000080;
     border: 1px solid #333;
     border-radius: 8px;
     padding: 8px 16px;
-    font-size: 16px;
+    font-size: 20px;
 }
 QPushButton:hover {
     background-color: #9a9996;
@@ -291,10 +292,11 @@ QPushButton:hover {
         self.pushButton_10.setText(_translate("Dialog", "-"))
         self.pushButton_10.setStyleSheet("""QPushButton {
     background-color: #cdab8f;
+    color: #000080;
     border: 1px solid #333;
     border-radius: 8px;
     padding: 8px 16px;
-    font-size: 16px;
+    font-size: 24px;
 }
 QPushButton:hover {
     background-color: #9a9996;
@@ -306,10 +308,11 @@ QPushButton:hover {
         self.pushButton_11.setText(_translate("Dialog", "+"))
         self.pushButton_11.setStyleSheet("""QPushButton {
     background-color: #bad49d;
+    color: #000080;
     border: 1px solid #333;
     border-radius: 8px;
     padding: 8px 16px;
-    font-size: 16px;
+    font-size: 20px;
 }
 QPushButton:hover {
     background-color: #9a9996;
@@ -320,10 +323,11 @@ QPushButton:hover {
         self.pushButton_12.setText(_translate("Dialog", "-"))
         self.pushButton_12.setStyleSheet("""QPushButton {
     background-color: #cdab8f;
+    color: #000080;
     border: 1px solid #333;
     border-radius: 8px;
     padding: 8px 16px;
-    font-size: 16px;
+    font-size: 24px;
 }
 QPushButton:hover {
     background-color: #9a9996;
