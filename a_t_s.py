@@ -2,6 +2,7 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
+from config import load_config
 
 
 class Ui_Dialog(object):
@@ -73,6 +74,7 @@ class Ui_Dialog(object):
         
         
         # Таймер
+        
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label_h = QtWidgets.QLabel(parent=Dialog)
@@ -111,22 +113,32 @@ class Ui_Dialog(object):
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        self.pushButton_Timer_start_stop = QtWidgets.QPushButton(parent=Dialog)
-        self.pushButton_Timer_start_stop.setMinimumSize(QtCore.QSize(0, 40))
-        self.pushButton_Timer_start_stop.setAutoDefault(True)
-        self.pushButton_Timer_start_stop.setDefault(False)
-        self.pushButton_Timer_start_stop.setObjectName("pushButton_Timer_start_stop")
-        self.horizontalLayout_4.addWidget(self.pushButton_Timer_start_stop)
+        # self.pushButton_Timer_start_stop = QtWidgets.QPushButton(parent=Dialog)
+        # self.pushButton_Timer_start_stop.setMinimumSize(QtCore.QSize(0, 40))
+        # self.pushButton_Timer_start_stop.setAutoDefault(True)
+        # self.pushButton_Timer_start_stop.setDefault(False)
+        # self.pushButton_Timer_start_stop.setObjectName("pushButton_Timer_start_stop")
+        # self.horizontalLayout_4.addWidget(self.pushButton_Timer_start_stop)
+        self.pushButton_Timer_setTimer = QtWidgets.QPushButton(parent=Dialog)
+        self.pushButton_Timer_setTimer.setMinimumSize(QtCore.QSize(0, 40))
+        self.pushButton_Timer_setTimer.setObjectName("pushButton_Timer_setTimer")
+        self.horizontalLayout_4.addWidget(self.pushButton_Timer_setTimer)
         self.pushButton_Timer_reset = QtWidgets.QPushButton(parent=Dialog)
         self.pushButton_Timer_reset.setMinimumSize(QtCore.QSize(0, 40))
         self.pushButton_Timer_reset.setDefault(False)
         self.pushButton_Timer_reset.setObjectName("pushButton_Timer_reset")
         self.horizontalLayout_4.addWidget(self.pushButton_Timer_reset)
         self.verticalLayout.addLayout(self.horizontalLayout_4)
-        self.pushButton_Timer_setTimer = QtWidgets.QPushButton(parent=Dialog)
-        self.pushButton_Timer_setTimer.setMinimumSize(QtCore.QSize(99, 35))
-        self.pushButton_Timer_setTimer.setObjectName("pushButton_Timer_setTimer")
-        self.verticalLayout.addWidget(self.pushButton_Timer_setTimer)
+        # self.pushButton_Timer_setTimer = QtWidgets.QPushButton(parent=Dialog)
+        # self.pushButton_Timer_setTimer.setMinimumSize(QtCore.QSize(99, 35))
+        # self.pushButton_Timer_setTimer.setObjectName("pushButton_Timer_setTimer")
+        # self.verticalLayout.addWidget(self.pushButton_Timer_setTimer)
+        self.pushButton_Timer_start_stop = QtWidgets.QPushButton(parent=Dialog)
+        self.pushButton_Timer_start_stop.setMinimumSize(QtCore.QSize(99, 35))
+        self.pushButton_Timer_start_stop.setAutoDefault(True)
+        self.pushButton_Timer_start_stop.setDefault(False)
+        self.pushButton_Timer_start_stop.setObjectName("pushButton_Timer_start_stop")
+        self.verticalLayout.addWidget(self.pushButton_Timer_start_stop)
         self.horizontalLayout_20.addLayout(self.verticalLayout)
         
         # добавляем кнопку останов музыки на таймере
@@ -255,14 +267,21 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Будильник/Таймер/Секндомер"))
+        
+        # Инициализация часов, минут, секунд
+        path_env_timer = ".env_newsettimer"
+        default_value_h = str(load_config(path_env_timer).N_C.default_value_h)
+        default_value_min = str(load_config(path_env_timer).N_C.default_value_min)
+        default_value_s = str(load_config(path_env_timer).N_C.default_value_s)
+        
         self.pushButton_Alarm.setText(_translate("Dialog", "Будильник"))
         self.pushButton_Timer.setText(_translate("Dialog", "Таймер"))
         self.pushButton_Sec.setText(_translate("Dialog", "Секундомер"))
-        self.label_h.setText(_translate("Dialog", "0"))
+        self.label_h.setText(_translate("Dialog", default_value_h))
         self.label_Timer_h.setText(_translate("Dialog", "ч."))
-        self.label_min.setText(_translate("Dialog", "0"))
+        self.label_min.setText(_translate("Dialog", default_value_min))
         self.label_Timer_min.setText(_translate("Dialog", "мин."))
-        self.label_sec.setText(_translate("Dialog", "0"))
+        self.label_sec.setText(_translate("Dialog", default_value_s))
         self.label_Timer_sec.setText(_translate("Dialog", "сек."))
         self.pushButton_Timer_start_stop.setText(_translate("Dialog", "Старт"))
         self.pushButton_Timer_reset.setText(_translate("Dialog", "Сброс"))

@@ -6,6 +6,13 @@ import os
 from PyQt6.QtCore import QUrl, pyqtSignal
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtWidgets import QDialog, QFileDialog
+from config import load_config
+# Инициализация часов, минут, секунд
+path_env_timer = ".env_newsettimer"
+default_value_h = load_config(path_env_timer).N_C.default_value_h
+default_value_min = load_config(path_env_timer).N_C.default_value_min
+default_value_s = load_config(path_env_timer).N_C.default_value_s
+default_value_music = load_config(path_env_timer).N_C.default_value_music
 
 # Получаем путь к папке скрипта для работы с файлами
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -217,6 +224,7 @@ QPushButton:hover {
         self.spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.spinBox.setMaximum(23)
         self.spinBox.setObjectName("spinBox")
+        self.spinBox.setValue(default_value_h)
         self.verticalLayout.addWidget(self.spinBox)
         
         # подмена старого spinBox на новый определенный в классе ZeroPaddedSpinBox
@@ -303,6 +311,7 @@ QPushButton:hover {
         self.spinBox_2.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.spinBox_2.setMaximum(59)
         self.spinBox_2.setObjectName("spinBox_2")
+        self.spinBox_2.setValue(default_value_min)
         self.verticalLayout_2.addWidget(self.spinBox_2)
         
         # подмена старого spinBox на новый определенный в классе ZeroPaddedSpinBox
@@ -389,6 +398,7 @@ QPushButton:hover {
         self.spinBox_3.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.spinBox_3.setMaximum(59)
         self.spinBox_3.setObjectName("spinBox_3")
+        self.spinBox_3.setValue(default_value_s)
         self.verticalLayout_3.addWidget(self.spinBox_3)
         
         # подмена старого spinBox на новый определенный в классе ZeroPaddedSpinBox
@@ -505,7 +515,7 @@ QPushButton:hover {
         QtCore.QMetaObject.connectSlotsByName(self)
         
         # предустановленная мелодия
-        self.music = os.path.join(BASE_DIR, "1.mp3")
+        self.music = os.path.join(BASE_DIR, default_value_music)
         # если предустановленной мелодии не существует не позволяем ее оставить без выбора
         if not os.path.exists(self.music):
             self.ok_Button.setEnabled(False)
@@ -630,6 +640,8 @@ QPushButton:hover {
         # Ваше выбранное значение
         selected_value = (self.spinBox.text(), self.spinBox_2.text(), self.spinBox_3.text(), self.music)
         self.value_selected.emit(selected_value)  # Испускание сигнала с передачей значения
+        with open(".env_newsettimer", "w") as f:
+            f.write(f"DEF_VALUE_H={self.spinBox.text()}\nDEF_VALUE_MIN={self.spinBox_2.text()}\nDEF_VALUE_S={self.spinBox_3.text()}\nMUSIC={self.music}")
         self.accept()  # Закрываем окно
     # останавливаем воспроизведение музыки
     

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+"""Для отображения иконки делаем cp ~/Рабочий\ стол/Alarm.desktop ~/.local/share/applications/"""
 import uuid
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -15,6 +15,9 @@ import os
 
 # Получаем путь к папке скрипта для работы с файлами
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Склеиваем путь к папке с именем файла иконки
+ICON_PATH = os.path.join(BASE_DIR, 'icon.png')
 
 
 def load_stylesheet(path):
@@ -237,6 +240,9 @@ class AlarmWidget(QtWidgets.QFrame):
 class Window(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.setObjectName("ClockWindow")
+        # Это помогает некоторым менеджерам окон подцепить иконку
+        self.setWindowIcon(QtGui.QIcon(ICON_PATH))
         # Загружаем и применяем стиль
         style_path = os.path.join(BASE_DIR, "style.qss")
         if os.path.exists(style_path):
@@ -264,7 +270,7 @@ class Window(QtWidgets.QWidget):
         except Exception:
             print("Файл будильников не найден или пуст")
         
-        # Таймер (логика сокращена для краткости, оставьте свою)
+        # Таймер чтение значений сохраненных
         self.timer_set = 0
         try:
             js = data_from_json(self.path_timer)
@@ -450,28 +456,7 @@ class Window(QtWidgets.QWidget):
     
     
     # реализация отображения значений таймера и проверки условия останова
-    # def on_timeout(self):
-    #
-    #     # проверяем условие останова таймер
-    #     if self.timer_set == 0:
-    #         self.timer.stop()
-    #         self.ui.pushButton_Timer.click()  # нажатием на кнопку переходим в окно таймера
-    #         self.ui.pushButton_Timer_start_stop.setText('Старт')
-    #         self.ui.pushButton_Timer_reset.setEnabled(True)
-    #         self.ui.pushButton_Timer_setTimer.setEnabled(True)
-    #         self.ui.pushButton_Timer_setTimer.hide()  # скрываем кнопку настроек, для вывода кнопки останова сигнала
-    #         self.ui.pushButton_Timer_music.show()
-    #         self.ui.pushButton_Timer_start_stop.setEnabled(False)
-    #         # воспроизводим сигнал (при достижении таймером 0)
-    #         file_path: str = self.path_music
-    #         self.player.setAudioOutput(self.audio_output)
-    #         self.player.setSource(QUrl.fromLocalFile(file_path))
-    #         self.audio_output.setVolume(50)
-    #         self.player.play()  # Воспроизведение аудио
-    #
-    #     else:
-    #         self.timer_set = self.timer_set - 1  # уменьшаем таймер на 1
-    #         self.calc_time()
+    
     
     def on_timeout(self):
         if self.timer_set == 0:
@@ -544,16 +529,6 @@ class Window(QtWidgets.QWidget):
             print(e)
     
     # Останов музыки
-    # def music_stop(self):
-    #     self.player.stop()
-    #     self.ui.pushButton_Timer_setTimer.show()  # скрываем кнопку настроек, для вывода кнопки останова сигнала
-    #     self.ui.pushButton_Timer_music.hide()
-    #     if self.fist_timer_set > 0:
-    #         self.timer_set = self.fist_timer_set
-    #         self.calc_time()
-    #         # Делаем кнопку активной
-    #         self.ui.pushButton_Timer_start_stop.setEnabled(True)
-    
     def music_stop(self):
         self.player.stop()
         # Возвращаем начальное время, если нужно
@@ -761,8 +736,26 @@ class Window(QtWidgets.QWidget):
     
     
 if __name__ == '__main__':
+    
     import sys
+    import os
+    
+    sys.argv[0] = 'clock_app'  # Подменяем имя программы
     app = QtWidgets.QApplication(sys.argv)
+    # Строка, которая помогает Linux связать окно и иконку
+    app.setDesktopFileName("clock_app")
+    
+    # 1. Формируем путь (исправляем проблему путей)
+    CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+    ICON_PATH = os.path.join(CURRENT_DIR, 'icon.png')
+    
+    # 2. Создаем объект иконки
+    icon = QtGui.QIcon(ICON_PATH)
+    
+    # 3. Устанавливаем иконку приложению
+    app.setWindowIcon(icon)
+    
     window = Window()
+    window.setWindowTitle("Clock App")
     window.show()
     sys.exit(app.exec())

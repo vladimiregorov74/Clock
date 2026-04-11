@@ -191,21 +191,15 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QPushButton" name="pushButton_Timer_start_stop">
+          <widget class="QPushButton" name="pushButton_Timer_setTimer">
            <property name="minimumSize">
             <size>
-             <width>0</width>
-             <height>40</height>
+             <width>99</width>
+             <height>35</height>
             </size>
            </property>
            <property name="text">
-            <string>Старт</string>
-           </property>
-           <property name="autoDefault">
-            <bool>true</bool>
-           </property>
-           <property name="default">
-            <bool>false</bool>
+            <string>Задать время и мелодию</string>
            </property>
           </widget>
          </item>
@@ -228,15 +222,21 @@
         </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_Timer_setTimer">
+        <widget class="QPushButton" name="pushButton_Timer_start_stop">
          <property name="minimumSize">
           <size>
-           <width>99</width>
-           <height>35</height>
+           <width>0</width>
+           <height>40</height>
           </size>
          </property>
          <property name="text">
-          <string>Задать время и мелодию</string>
+          <string>Старт</string>
+         </property>
+         <property name="autoDefault">
+          <bool>true</bool>
+         </property>
+         <property name="default">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
