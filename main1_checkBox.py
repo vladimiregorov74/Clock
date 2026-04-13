@@ -259,6 +259,9 @@ class AlarmWidget(QtWidgets.QFrame):
 class Window(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.setObjectName("ClockWindow")
+        # Это помогает некоторым менеджерам окон подцепить иконку
+        self.setWindowIcon(QtGui.QIcon(ICON_PATH))
         # Загружаем и применяем стиль
         style_path = os.path.join(BASE_DIR, "style.qss")
         if os.path.exists(style_path):
@@ -357,6 +360,16 @@ class Window(QtWidgets.QWidget):
         self.alarm_timer = QtCore.QTimer(self)
         self.alarm_timer.timeout.connect(self.check_alarms)
         self.alarm_timer.start(1000)
+        
+        # --- Таймер для часов ---
+        self.clock_timer = QtCore.QTimer(self)
+        self.clock_timer.timeout.connect(self.update_clock)
+        self.clock_timer.start(1000)
+        self.update_clock()  # сразу показать текущее время при запуске
+    
+    def update_clock(self):
+        current_time = QtCore.QTime.currentTime().toString("HH:mm:ss")
+        self.ui.label_clock.setText(current_time)
     
     # переход в окно секундомера
     def window_sec(self):
@@ -780,11 +793,27 @@ class Window(QtWidgets.QWidget):
         dialog.stop_alarm.connect(self.player.stop)
         dialog.exec()
 
-    
-    
+
 if __name__ == '__main__':
     import sys
+    import os
+    
+    sys.argv[0] = 'clock_app'  # Подменяем имя программы
     app = QtWidgets.QApplication(sys.argv)
+    # Строка, которая помогает Linux связать окно и иконку
+    app.setDesktopFileName("clock_app")
+    
+    # 1. Формируем путь (исправляем проблему путей)
+    # CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    
+    # 2. Создаем объект иконки
+    icon = QtGui.QIcon(ICON_PATH)
+    
+    # 3. Устанавливаем иконку приложению
+    app.setWindowIcon(icon)
+    
     window = Window()
+    window.setWindowTitle("Clock App")
     window.show()
     sys.exit(app.exec())

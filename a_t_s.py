@@ -46,6 +46,17 @@ class Ui_Dialog(object):
         self.horizontalLayout.addWidget(self.pushButton_Sec)
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout.addItem(spacerItem2)
+        # --- ЧАСЫ ---
+        self.label_clock = QtWidgets.QLabel(parent=Dialog)
+        self.label_clock.setObjectName("label_clock")
+        font_clock = QtGui.QFont()
+        font_clock.setPointSize(48)
+        font_clock.setBold(True)
+        self.label_clock.setFont(font_clock)
+        self.label_clock.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.label_clock.setText("00:00:00")
+        self.verticalLayout.addWidget(self.label_clock)
+        # --- конец часов ---
         self.verticalLayout.addLayout(self.horizontalLayout)
         
         # Будильник

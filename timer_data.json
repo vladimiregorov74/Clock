@@ -1,1 +1,4 @@
-{"save_timer": 2, "path_music": "/mnt/D/PycharmProjects/Clock/2.mp3"}
+{
+    "save_timer": 5,
+    "path_music": "/home/vladimiregorov/PycharmProjects/Clock/2.mp3"
+}

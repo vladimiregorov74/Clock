@@ -1,0 +1,34 @@
+[
+    {
+        "id": "dd4e54cb28e34463b5d8c517626e6036",
+        "name_al": "Пора спать",
+        "time_al": "22:00",
+        "week_al": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+        ],
+        "music": "/mnt/D/PycharmProjects/Clock/1.mp3",
+        "enabled": true
+    },
+    {
+        "id": "8c15bd68095a4b458f3c5c87f5378539",
+        "name_al": "Новый будильник",
+        "time_al": "19:00",
+        "week_al": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+        ],
+        "music": "/home/vladimiregorov/PycharmProjects/Clock/1.mp3",
+        "enabled": false
+    }
+]
