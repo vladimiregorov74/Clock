@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Alarm
+Comment=My Alarm
+Terminal=false
+Icon=/mnt/D/PycharmProjects/Clock/icon.png
+Exec=/mnt/D/PycharmProjects/Clock/bat.sh
+Type=Application
+Categories=Utility;
+Keywords=Alarm;
