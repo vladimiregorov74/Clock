@@ -1,0 +1,36 @@
+{
+    "my_alarm": [
+        {
+            "id": 1,
+            "time_al": "22:00",
+            "name_al": "Пора спать",
+            "week_al": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "music": "1.mp3",
+            "enabled": false
+        },
+        {
+            "id": 2,
+            "time_al": "06:00",
+            "name_al": "Пора вставать",
+            "week_al": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "music": "2.mp3",
+            "enabled": true
+        }
+    ]
+}

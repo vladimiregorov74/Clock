@@ -1,0 +1,20 @@
+[project]
+name = "clock"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "vladimiregorov74",email = "vladimiregorov74@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyqt6-sip (>=13.10.3,<14.0.0)",
+    "pyqt6 (==6.10.2)",
+    "pyqt6-qt6 (==6.10.1)",
+    "environs (>=15.0.1,<16.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
