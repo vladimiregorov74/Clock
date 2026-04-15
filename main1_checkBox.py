@@ -187,7 +187,7 @@ class AlarmWidget(QtWidgets.QFrame):
         # self.main_layout.addSpacing(20)
         
         self.checkBox_2 = ClickableForm()
-        self.checkBox_2.setScale(0.7, 0.6)
+        self.checkBox_2.setScale(0.8, 1.1)
         # Для стилей задаем имя чекбокса
         self.checkBox_2.setObjectName("AlarmCheck")
         self.checkBox_2.setChecked(value['enabled'])

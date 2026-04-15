@@ -23,8 +23,8 @@ class ClickableForm(QtWidgets.QAbstractButton):
 
     BASE_WIDTH = 48
     BASE_HEIGHT = 22
-    BASE_RADIUS = 9
-    BASE_KNOB = 18
+    BASE_RADIUS = 16
+    BASE_KNOB = 20
     BASE_MARGIN = 2
 
     def __init__(
