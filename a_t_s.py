@@ -56,6 +56,15 @@ class Ui_Dialog(object):
         self.label_clock.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label_clock.setText("00:00:00")
         self.verticalLayout.addWidget(self.label_clock)
+        self.label_clock.setStyleSheet("""
+            #label_clock {
+                border-image: url(pic.jpg);
+                background-repeat: no-repeat;
+                background-position: center;
+                border: 1px solid #333;
+                border-radius: 12px;
+            }
+        """)
         # --- конец часов ---
         self.verticalLayout.addLayout(self.horizontalLayout)
         
@@ -69,6 +78,28 @@ class Ui_Dialog(object):
         self.scrollArea_Alarm.setMinimumSize(QtCore.QSize(0, 520))
         self.scrollArea_Alarm.setWidgetResizable(True)
         self.scrollArea_Alarm.setObjectName("scrollArea_Alarm")
+        self.scrollArea_Alarm.setStyleSheet("""
+            /* Сама рамка скролла */
+            QScrollArea {
+                border: 2px solid #57e389;
+                border-radius: 8px;
+                background-color: transparent; /* Делаем основу прозрачной */
+            }
+
+            /* Внутреннее пространство, где лежат виджеты */
+            QScrollArea QWidget#qt_scrollarea_viewport {
+                background-image: url(pic.jpg);
+                background-position: center;
+                background-repeat: no-repeat;
+                /* Если картинка маленькая и нужно растянуть, используйте border-image: */
+                /* border-image: url(pic.jpg) 0 0 0 0 stretch stretch; */
+            }
+
+            /* Контейнер для виджетов тоже должен быть прозрачным */
+            #scrollAreaWidgetContents_Alarm {
+                background: transparent;
+            }
+        """)
         self.scrollAreaWidgetContents_Alarm = QtWidgets.QWidget()
         self.scrollAreaWidgetContents_Alarm.setGeometry(QtCore.QRect(0, 0, 442, 514))
         self.scrollAreaWidgetContents_Alarm.setObjectName("scrollAreaWidgetContents_Alarm")
@@ -231,10 +262,21 @@ class Ui_Dialog(object):
         self.scrollArea.setMinimumSize(QtCore.QSize(0, 250))
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
+        self.scrollArea.setStyleSheet("""
+            QScrollArea {
+                border: 1px solid #d4e040;
+                border-radius: 12px;
+                background-color: transparent;
+            }
+            #scrollArea QWidget#qt_scrollarea_viewport {
+                border-image: url(pic.jpg) 0 0 0 0 stretch stretch;
+            }
+        """)
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 354, 248))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+        
         # Слой внутри прокрутки, куда будут падать лейблы
         self.roundsLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.roundsLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)  # Все круги прижимаются к верху
@@ -274,6 +316,8 @@ class Ui_Dialog(object):
         self.pushButton_Alarm.setStyleSheet("background-color: #57e389;")
         self.pushButton_Timer.setStyleSheet("background-color: #d4e040;")
         self.pushButton_Sec.setStyleSheet("background-color: #d4e040;")
+        
+        
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
