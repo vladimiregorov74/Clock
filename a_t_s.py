@@ -181,7 +181,7 @@ class Ui_Dialog(object):
         self.pushButton_Timer_start_stop.setDefault(False)
         self.pushButton_Timer_start_stop.setObjectName("pushButton_Timer_start_stop")
         self.verticalLayout.addWidget(self.pushButton_Timer_start_stop)
-        self.horizontalLayout_20.addLayout(self.verticalLayout)
+        # self.horizontalLayout_20.addLayout(self.verticalLayout)
         
         # добавляем кнопку останов музыки на таймере
         self.pushButton_Timer_music = QtWidgets.QPushButton(parent=Dialog)
@@ -281,7 +281,7 @@ class Ui_Dialog(object):
         self.roundsLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.roundsLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)  # Все круги прижимаются к верху
         self.verticalLayout.addWidget(self.scrollArea)
-        self.horizontalLayout_20.addLayout(self.verticalLayout)
+        # self.horizontalLayout_20.addLayout(self.verticalLayout)
         
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout_20.addItem(spacerItem3)

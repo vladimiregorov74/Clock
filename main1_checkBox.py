@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Для отображения иконки делаем cp ~/Рабочий\ стол/Alarm.desktop ~/.local/share/applications/"""
+# """Для отображения иконки делаем cp ~/Рабочий\ стол/Alarm.desktop ~/.local/share/applications/"""
 import uuid
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -340,8 +340,8 @@ class Window(QtWidgets.QWidget):
         self.timer_sec = QtCore.QTimer()
         self.timer_sec.timeout.connect(self.on_timer_sec)
         
-        self.player = QMediaPlayer(self)
-        self.audio_output = QAudioOutput(self)
+        # self.player = QMediaPlayer(self)
+        # self.audio_output = QAudioOutput(self)
         
         # проверка статуса медиаплеера
         self.player.mediaStatusChanged.connect(self.handle_media_status)
@@ -443,35 +443,35 @@ class Window(QtWidgets.QWidget):
             self.ui.pushButton_Timer_reset.setEnabled(True)
             self.ui.pushButton_Timer_setTimer.setEnabled(True)  # Разблокируем настройки
     
-    def on_timeout(self):
-        # проверяем условие останова таймера
-        if self.timer_set == 0:
-            self.timer.stop()
-            
-            # Разблокируем элементы управления
-            self.ui.pushButton_Timer_start_stop.setText('Старт')
-            self.ui.pushButton_Timer_reset.setEnabled(True)
-            self.ui.pushButton_Timer_setTimer.setEnabled(True)  # Кнопка снова доступна
-            self.ui.pushButton_Timer_start_stop.setEnabled(False)
-            
-            # Воспроизводим сигнал
-            file_path: str = self.path_music
-            self.player.setSource(QUrl.fromLocalFile(file_path))
-            self.audio_output.setVolume(50)
-            self.player.play()
-            
-            # Показываем новое окно таймера
-            dialog = TimerTriggeredDialog(
-                timer_name="Таймер",
-                info_text="Заданный интервал времени истек",
-                parent=self
-            )
-            dialog.stop_alarm.connect(self.music_stop)
-            dialog.exec()
-        
-        else:
-            self.timer_set = self.timer_set - 1
-            self.calc_time()
+    # def on_timeout(self):
+    #     # проверяем условие останова таймера
+    #     if self.timer_set == 0:
+    #         self.timer.stop()
+    #
+    #         # Разблокируем элементы управления
+    #         self.ui.pushButton_Timer_start_stop.setText('Старт')
+    #         self.ui.pushButton_Timer_reset.setEnabled(True)
+    #         self.ui.pushButton_Timer_setTimer.setEnabled(True)  # Кнопка снова доступна
+    #         self.ui.pushButton_Timer_start_stop.setEnabled(False)
+    #
+    #         # Воспроизводим сигнал
+    #         file_path: str = self.path_music
+    #         self.player.setSource(QUrl.fromLocalFile(file_path))
+    #         self.audio_output.setVolume(50)
+    #         self.player.play()
+    #
+    #         # Показываем новое окно таймера
+    #         dialog = TimerTriggeredDialog(
+    #             timer_name="Таймер",
+    #             info_text="Заданный интервал времени истек",
+    #             parent=self
+    #         )
+    #         dialog.stop_alarm.connect(self.music_stop)
+    #         dialog.exec()
+    #
+    #     else:
+    #         self.timer_set = self.timer_set - 1
+    #         self.calc_time()
     
     def calc_time(self):
         # вычисляем часы, минути, секунды
