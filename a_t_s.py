@@ -8,7 +8,7 @@ from config import load_config
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(516, 650)
+        Dialog.resize(516, 670)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.horizontalLayout_20 = QtWidgets.QHBoxLayout()
