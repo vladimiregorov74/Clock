@@ -815,6 +815,6 @@ if __name__ == '__main__':
     
     window = Window()
     window.setWindowTitle("Clock App")
-    window.setFixedSize(490, 710) # фиксируем размер окна
+    window.setFixedSize(490, 720) # фиксируем размер окна
     window.show()
     sys.exit(app.exec())

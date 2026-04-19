@@ -8,7 +8,7 @@ from config import load_config
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(516, 670)
+        Dialog.resize(516, 680)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.horizontalLayout_20 = QtWidgets.QHBoxLayout()
@@ -282,6 +282,10 @@ class Ui_Dialog(object):
         self.roundsLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)  # Все круги прижимаются к верху
         self.verticalLayout.addWidget(self.scrollArea)
         # self.horizontalLayout_20.addLayout(self.verticalLayout)
+        self.label_1000 = QtWidgets.QLabel()
+        # self.label_1000.setText('1111111')
+        self.label_1000.setMinimumSize(450, 10)
+        self.verticalLayout.addWidget(self.label_1000)
         
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout_20.addItem(spacerItem3)
