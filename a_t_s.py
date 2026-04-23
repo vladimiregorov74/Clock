@@ -8,7 +8,7 @@ from config import load_config
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(516, 680)
+        Dialog.resize(516, 690)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.horizontalLayout_20 = QtWidgets.QHBoxLayout()
@@ -75,36 +75,31 @@ class Ui_Dialog(object):
         self.pushButton_Alarm_add.setObjectName("pushButton_Alarm_add")
         self.verticalLayout.addWidget(self.pushButton_Alarm_add)
         self.scrollArea_Alarm = QtWidgets.QScrollArea(parent=Dialog)
-        self.scrollArea_Alarm.setMinimumSize(QtCore.QSize(0, 520))
+        
+        
+        # Устанавливаем геометрию (проверь, чтобы y + height не превышало высоту окна)
+        self.scrollArea_Alarm.setGeometry(QtCore.QRect(20, 270, 391, 480))
+        self.scrollArea_Alarm.setMinimumSize(QtCore.QSize(0, 480))  # минимальная высота
+        self.scrollArea_Alarm.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding,
+            QtWidgets.QSizePolicy.Policy.Expanding  # растягивается по вертикали
+        )
         self.scrollArea_Alarm.setWidgetResizable(True)
         self.scrollArea_Alarm.setObjectName("scrollArea_Alarm")
-        self.scrollArea_Alarm.setStyleSheet("""
-            /* Сама рамка скролла */
-            QScrollArea {
-                border: 2px solid #57e389;
-                border-radius: 8px;
-                background-color: transparent; /* Делаем основу прозрачной */
-            }
-
-            /* Внутреннее пространство, где лежат виджеты */
-            QScrollArea QWidget#qt_scrollarea_viewport {
-                background-image: url(pic.jpg);
-                background-position: center;
-                background-repeat: no-repeat;
-                /* Если картинка маленькая и нужно растянуть, используйте border-image: */
-                /* border-image: url(pic.jpg) 0 0 0 0 stretch stretch; */
-            }
-
-            /* Контейнер для виджетов тоже должен быть прозрачным */
-            #scrollAreaWidgetContents_Alarm {
-                background: transparent;
-            }
-        """)
+        
+        # Защитный отступ для рамки
+        self.scrollArea_Alarm.setViewportMargins(2, 2, 2, 2)
+        
+        # отключаем горизонтальную прокрутку
+        self.scrollArea_Alarm.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        
+        
         self.scrollAreaWidgetContents_Alarm = QtWidgets.QWidget()
         self.scrollAreaWidgetContents_Alarm.setGeometry(QtCore.QRect(0, 0, 442, 514))
         self.scrollAreaWidgetContents_Alarm.setObjectName("scrollAreaWidgetContents_Alarm")
         self.verticalLayout_4A = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_Alarm)
         self.verticalLayout_4A.setObjectName("verticalLayout_4A")
+        self.verticalLayout_4A.setContentsMargins(10, 10, 10, 10)
         
         
         self.scrollArea_Alarm.setWidget(self.scrollAreaWidgetContents_Alarm)
@@ -291,8 +286,12 @@ class Ui_Dialog(object):
         self.horizontalLayout_20.addItem(spacerItem3)
         self.verticalLayout_2.addLayout(self.horizontalLayout_20)
         # Для обращения к этой распорке делаем ее через self
-        self.spacerItem4 = QtWidgets.QSpacerItem(0, 20, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        # self.spacerItem4 = QtWidgets.QSpacerItem(0, 20, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.spacerItem4 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Minimum,
+                                                 QtWidgets.QSizePolicy.Policy.Minimum)
         self.verticalLayout_2.addItem(self.spacerItem4)
+        
+        
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)

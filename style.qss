@@ -1,7 +1,7 @@
 /* style.qss */
 
 QWidget {
-    background-color: #f6f5f4;
+    background-color: rgb(255, 255, 255);
     color: #1a5fb4;
     font:"Monospace";
 }
@@ -85,3 +85,47 @@ QCheckBox#AlarmCheck {
 }
 
 
+QScrollArea {
+    background-color: transparent;
+    border: 2px solid #57e389;
+    border-radius: 8px;
+}
+
+/* Убираем рамку у внутреннего контейнера, чтобы она не двоилась */
+QScrollArea > QWidget > QWidget {
+    background: transparent;
+}
+
+QScrollArea {
+    background-color: #BDB76B;
+    border: 2px solid #57e389;
+    border-radius: 10px;
+}
+
+/* Принудительно убираем рамку и делаем прозрачным фон у внутреннего контейнера */
+#scrollAreaWidgetContents_Alarm {
+    background: transparent;
+    border: none;
+}
+
+QScrollBar:vertical {
+    background: #556B2F;   /* фон дорожки */
+    width: 10px;
+    border-radius: 5px;
+}
+
+QScrollBar::handle:vertical {
+    background: #bad49d;       /* сам ползунок */
+    border-radius: 5px;
+    height: 10px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #90EE90;       /* при наведении */
+}
+
+/* убираем кнопки-стрелки сверху и снизу */
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}

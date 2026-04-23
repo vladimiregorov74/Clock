@@ -4,7 +4,7 @@
 import uuid
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtCore import QUrl, Qt
+from PyQt6.QtCore import QUrl, Qt, QTimer
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 
 from data_in_to_json import data_from_json, data_to_json
@@ -94,6 +94,7 @@ class AlarmWidget(QtWidgets.QFrame):
     alarm_updated = QtCore.pyqtSignal()
     # сигнал для уведомления об удалении
     alarm_deleted = QtCore.pyqtSignal(str)
+    
 
     def __init__(self, value, parent=None):
         super().__init__(parent)
@@ -124,8 +125,7 @@ class AlarmWidget(QtWidgets.QFrame):
         self.verticalLayout_Alarm = QtWidgets.QVBoxLayout()
         self.label_name_2 = ClickableLabel(100, value['name_al'])  # 100 - заглушка
         # self.label_name_2 = QtWidgets.QLabel(value['name_al'])
-        self.label_name_2.setMinimumSize(QtCore.QSize(355, 0))
-        self.label_name_2.setMaximumSize(QtCore.QSize(355, 16777215))
+        self.label_name_2.setMinimumSize(QtCore.QSize(0, 0))
         self.label_name_2.setStyleSheet("""QLabel {
     color: #1a5fb4;
     border: 1px solid #333;
@@ -198,6 +198,7 @@ class AlarmWidget(QtWidgets.QFrame):
             self.checkBox_2.setChecked(True)
             self.checkBox_2.setStyleSheet("background-color: gold; color: red;")
         self.main_layout.addWidget(self.checkBox_2)
+        
     
     # ставим галочку - будильник активирован
     def on_enabled_changed(self, state):
@@ -252,6 +253,22 @@ class AlarmWidget(QtWidgets.QFrame):
                
         # 4. Сигнализируем окну Window, что пора сохранить изменения в файл
         self.alarm_updated.emit()
+
+    def flash_red(self):
+        # Устанавливаем стиль красной рамки
+        self.setStyleSheet("""
+            #AlarmCard {
+                border: 4px solid red;
+                background-color: #fff0f0;
+            }
+        """)
+
+        # Таймер выключит выделение через 2000 мс (2 секунды)
+        QTimer.singleShot(1000, self.reset_style)
+
+    def reset_style(self):
+        # Возвращаем стандартный стиль (пустая строка заставит подтянуться стили из style.qss)
+        self.setStyleSheet("")
        
         
         
@@ -283,8 +300,11 @@ class Window(QtWidgets.QWidget):
         # Загрузка
         try:
             alarms = data_from_json(self.path_alarm)
+
+            # СОРТИРОВКА: Сортируем список словарей по полю 'time_al'
+            alarms.sort(key=lambda x: x['time_al'])
+
             for alarm_val in alarms:
-                # ВАЖНО: Передаем только именованный аргумент
                 self.add_alarm(value=alarm_val)
         except Exception:
             print("Файл будильников не найден или пуст")
@@ -442,36 +462,24 @@ class Window(QtWidgets.QWidget):
             self.ui.pushButton_Timer_start_stop.setText('Старт')
             self.ui.pushButton_Timer_reset.setEnabled(True)
             self.ui.pushButton_Timer_setTimer.setEnabled(True)  # Разблокируем настройки
-    
-    # def on_timeout(self):
-    #     # проверяем условие останова таймера
-    #     if self.timer_set == 0:
-    #         self.timer.stop()
-    #
-    #         # Разблокируем элементы управления
-    #         self.ui.pushButton_Timer_start_stop.setText('Старт')
-    #         self.ui.pushButton_Timer_reset.setEnabled(True)
-    #         self.ui.pushButton_Timer_setTimer.setEnabled(True)  # Кнопка снова доступна
-    #         self.ui.pushButton_Timer_start_stop.setEnabled(False)
-    #
-    #         # Воспроизводим сигнал
-    #         file_path: str = self.path_music
-    #         self.player.setSource(QUrl.fromLocalFile(file_path))
-    #         self.audio_output.setVolume(50)
-    #         self.player.play()
-    #
-    #         # Показываем новое окно таймера
-    #         dialog = TimerTriggeredDialog(
-    #             timer_name="Таймер",
-    #             info_text="Заданный интервал времени истек",
-    #             parent=self
-    #         )
-    #         dialog.stop_alarm.connect(self.music_stop)
-    #         dialog.exec()
-    #
-    #     else:
-    #         self.timer_set = self.timer_set - 1
-    #         self.calc_time()
+
+    def reorder_alarms(self):
+        # 1. Собираем все существующие виджеты будильников
+        widgets = self.findChildren(AlarmWidget)
+        if not widgets:
+            return
+
+        # 2. Сортируем их по времени (атрибут time_al у AlarmWidget)
+        widgets.sort(key=lambda w: w.time_al)
+
+        # 3. Удаляем их из layout (но не из памяти!)
+        for w in widgets:
+            self.ui.verticalLayout_4A.removeWidget(w)
+
+        # 4. Добавляем обратно в правильном порядке
+        # (индекс 0, так как мы хотим, чтобы они были выше распорки/spacer)
+        for i, w in enumerate(widgets):
+            self.ui.verticalLayout_4A.insertWidget(i, w)
     
     def calc_time(self):
         # вычисляем часы, минути, секунды
@@ -485,29 +493,6 @@ class Window(QtWidgets.QWidget):
     
     
     # реализация отображения значений таймера и проверки условия останова
-    # def on_timeout(self):
-    #
-    #     # проверяем условие останова таймер
-    #     if self.timer_set == 0:
-    #         self.timer.stop()
-    #         self.ui.pushButton_Timer.click()  # нажатием на кнопку переходим в окно таймера
-    #         self.ui.pushButton_Timer_start_stop.setText('Старт')
-    #         self.ui.pushButton_Timer_reset.setEnabled(True)
-    #         self.ui.pushButton_Timer_setTimer.setEnabled(True)
-    #         self.ui.pushButton_Timer_setTimer.hide()  # скрываем кнопку настроек, для вывода кнопки останова сигнала
-    #         self.ui.pushButton_Timer_music.show()
-    #         self.ui.pushButton_Timer_start_stop.setEnabled(False)
-    #         # воспроизводим сигнал (при достижении таймером 0)
-    #         file_path: str = self.path_music
-    #         self.player.setAudioOutput(self.audio_output)
-    #         self.player.setSource(QUrl.fromLocalFile(file_path))
-    #         self.audio_output.setVolume(50)
-    #         self.player.play()  # Воспроизведение аудио
-    #
-    #     else:
-    #         self.timer_set = self.timer_set - 1  # уменьшаем таймер на 1
-    #         self.calc_time()
-    
     def on_timeout(self):
         if self.timer_set == 0:
             self.timer.stop()
@@ -579,16 +564,6 @@ class Window(QtWidgets.QWidget):
             print(e)
     
     # Останов музыки
-    # def music_stop(self):
-    #     self.player.stop()
-    #     self.ui.pushButton_Timer_setTimer.show()  # скрываем кнопку настроек, для вывода кнопки останова сигнала
-    #     self.ui.pushButton_Timer_music.hide()
-    #     if self.fist_timer_set > 0:
-    #         self.timer_set = self.fist_timer_set
-    #         self.calc_time()
-    #         # Делаем кнопку активной
-    #         self.ui.pushButton_Timer_start_stop.setEnabled(True)
-    
     def music_stop(self):
         self.player.stop()
         # Возвращаем начальное время, если нужно
@@ -695,11 +670,11 @@ class Window(QtWidgets.QWidget):
         # Проверяем, что медиафайл проигран до конца
         if status == QMediaPlayer.MediaStatus.EndOfMedia:
             self.music_stop()
-    
+
     def add_alarm(self, value=None):
-        # Если value это False (пришло от нажатия кнопки), создаем новый ID
-        if value is None or isinstance(value, bool):
-           
+        is_new = (value is None or isinstance(value, bool))  # Флаг: создан вручную, а не загружен
+
+        if is_new:
             value = {
                 'id': uuid.uuid4().hex,
                 'time_al': '08:00',
@@ -708,15 +683,21 @@ class Window(QtWidgets.QWidget):
                 'music': self.default_music,
                 'enabled': False
             }
-        
+
         alarm = AlarmWidget(value)
         alarm.alarm_updated.connect(self.save_all_alarms)
-        # Подключаем очистку кэша при удалении
+        # ПОДКЛЮЧАЕМ пересортировку при обновлении времени внутри виджета
+        alarm.alarm_updated.connect(self.reorder_alarms)
         alarm.alarm_deleted.connect(self.cleanup_triggered_cache)
-        # Вставляем перед распоркой (которая у вас в verticalLayout_4A)
+
         self.ui.verticalLayout_4A.insertWidget(0, alarm)
-        # сохраняем будильник
+
+        # Сразу сортируем после добавления
+        self.reorder_alarms()
         self.save_all_alarms()
+        # Если это новый будильник (нажали "+"), подсвечиваем его
+        if is_new:
+            alarm.flash_red()
         
     def cleanup_triggered_cache(self, alarm_id):
         """Удаляет данные о срабатывании для удаленного будильника"""
@@ -795,9 +776,9 @@ class Window(QtWidgets.QWidget):
 
 
 if __name__ == '__main__':
-    import sys
     import os
-    
+    import sys
+
     sys.argv[0] = 'clock_app'  # Подменяем имя программы
     app = QtWidgets.QApplication(sys.argv)
     # Строка, которая помогает Linux связать окно и иконку
@@ -815,6 +796,8 @@ if __name__ == '__main__':
     
     window = Window()
     window.setWindowTitle("Clock App")
-    window.setFixedSize(490, 720) # фиксируем размер окна
+    window.setMinimumSize(490, 730)
+    window.setMaximumWidth(490)  # ширина фиксирована, высота свободна
+    window.resize(490, 730)
     window.show()
     sys.exit(app.exec())
